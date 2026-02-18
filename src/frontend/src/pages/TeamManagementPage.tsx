@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { ArrowLeft, User, Activity, Save, MessageSquare, UserCheck, UserMinus } from 'lucide-react';
+import { ArrowLeft, Activity, Save, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useGetAllPatientSubmissions, useUpdatePatientSubmission } from '@/hooks/useSubmissions';
 import { SubmissionStatus } from '@/backend';
 import type { PatientSubmission } from '@/backend';
+import { buildWhatsAppUrl } from '@/utils/whatsapp';
+import PatientDetailsCard from '@/components/team/PatientDetailsCard';
 
 export default function TeamManagementPage() {
   const navigate = useNavigate();
@@ -57,7 +59,20 @@ export default function TeamManagementPage() {
     return match ? match[1].trim() : null;
   };
 
-  const extractPatientInfo = (context: string) => {
+  const getPatientInfo = (submission: PatientSubmission) => {
+    // Prefer structured personalInfo fields, fallback to context parsing
+    if (submission.personalInfo.fullName) {
+      return {
+        name: submission.personalInfo.fullName || 'N/A',
+        room: submission.personalInfo.roomNumber || 'N/A',
+        nationality: submission.personalInfo.country || 'N/A',
+        whatsapp: submission.personalInfo.whatsappNumber || '',
+        symptoms: submission.personalInfo.symptoms || submission.personalInfo.medicalConditions || 'N/A',
+      };
+    }
+    
+    // Fallback to context parsing for older submissions
+    const context = submission.detailedInfo.context || '';
     return {
       name: extractField(context, 'Name') || 'N/A',
       room: extractField(context, 'Room') || 'N/A',
@@ -67,13 +82,13 @@ export default function TeamManagementPage() {
     };
   };
 
-  const formatWAUrl = (num: string) => {
-    if (!num) return '#';
-    let cleaned = num.replace(/\D/g, '');
-    if (cleaned.startsWith('0')) {
-      cleaned = '62' + cleaned.substring(1);
+  const handleWhatsAppClick = () => {
+    if (!selectedPatient) return;
+    
+    const whatsappUrl = buildWhatsAppUrl(selectedPatient);
+    if (whatsappUrl) {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     }
-    return `https://wa.me/${cleaned}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,7 +96,7 @@ export default function TeamManagementPage() {
     if (!selectedPatient) return;
 
     try {
-      const patientInfo = extractPatientInfo(selectedPatient.detailedInfo.context || '');
+      const patientInfo = getPatientInfo(selectedPatient);
       const updatedContext = `Name: ${patientInfo.name}, Room: ${patientInfo.room}, Nationality: ${patientInfo.nationality}, WhatsApp: ${patientInfo.whatsapp}, Symptoms: ${patientInfo.symptoms}, Blood Pressure: ${medicalUpdate.tensi}, Pulse: ${medicalUpdate.nadi}, Oxygen: ${medicalUpdate.oksigen}, Blood Sugar: ${medicalUpdate.bloodSugar}, Cholesterol: ${medicalUpdate.cholesterol}, Uric Acid: ${medicalUpdate.uricAcid}, Meet Doctor: ${medicalUpdate.meetDoctor === 'yes' ? 'Yes' : 'No'}, Meeting Date: ${medicalUpdate.meetDoctor === 'yes' ? medicalUpdate.meetingDate : '-'}, Meeting Time: ${medicalUpdate.meetDoctor === 'yes' ? medicalUpdate.meetingTime : '-'}`;
 
       await updateSubmission.mutateAsync({
@@ -114,8 +129,6 @@ export default function TeamManagementPage() {
     );
   }
 
-  const patientInfo = extractPatientInfo(selectedPatient.detailedInfo.context || '');
-
   return (
     <div className="bg-muted/30 min-h-[calc(100vh-8rem)] py-8">
       <div className="container max-w-3xl mx-auto px-4">
@@ -125,136 +138,188 @@ export default function TeamManagementPage() {
         </Button>
 
         <div className="space-y-4">
-          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-            <div className="bg-primary/5 p-4 border-b border-border flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <User size={18} className="text-primary" />
-                <h3 className="font-bold text-primary">Patient Details</h3>
-              </div>
-              {patientInfo.whatsapp && (
-                <a
-                  href={formatWAUrl(patientInfo.whatsapp)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
-                >
-                  <MessageSquare size={14} />
-                  WhatsApp
-                </a>
-              )}
-            </div>
-            <div className="p-4 grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Name</p>
-                <p className="font-medium text-foreground">{patientInfo.name}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Room</p>
-                <p className="font-medium text-foreground">{patientInfo.room}</p>
-              </div>
-              <div className="col-span-2 pt-2 border-t border-border">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Symptoms</p>
-                <p className="text-foreground italic">"{patientInfo.symptoms}"</p>
-              </div>
-            </div>
-          </div>
+          <PatientDetailsCard submission={selectedPatient} onWhatsAppClick={handleWhatsAppClick} />
 
-          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
-            <div className="bg-primary p-4 text-primary-foreground flex items-center gap-2">
-              <Activity size={18} />
-              <h3 className="font-bold">Medical Examination</h3>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { label: 'Blood Pressure', name: 'tensi', unit: 'mmHg' },
-                  { label: 'Pulse', name: 'nadi', unit: 'bpm' },
-                  { label: 'Oxygen', name: 'oksigen', unit: '%' },
-                  { label: 'Blood Sugar', name: 'bloodSugar', unit: 'mg/dL' },
-                  { label: 'Cholesterol', name: 'cholesterol', unit: 'mg/dL' },
-                  { label: 'Uric Acid', name: 'uricAcid', unit: 'mg/dL' },
-                ].map((field) => (
-                  <div key={field.name}>
-                    <Label htmlFor={field.name} className="text-xs font-bold text-muted-foreground uppercase mb-1">
-                      {field.label}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+              <div className="bg-primary/5 p-4 border-b border-border flex items-center gap-2">
+                <Activity size={18} className="text-primary" />
+                <h3 className="font-bold text-primary">Medical Examination</h3>
+              </div>
+              <div className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="tensi" className="text-sm font-bold">
+                      Blood Pressure (Tensi)
                     </Label>
                     <Input
-                      id={field.name}
+                      id="tensi"
                       type="text"
-                      placeholder={field.unit}
-                      value={medicalUpdate[field.name as keyof typeof medicalUpdate] as string}
-                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, [field.name]: e.target.value })}
-                      className="border-0 border-b border-border rounded-none focus-visible:ring-0 focus-visible:border-primary focus-visible:border-b-2 transition-all bg-transparent px-0"
+                      placeholder="e.g. 120/80"
+                      value={medicalUpdate.tensi}
+                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, tensi: e.target.value })}
+                      className="bg-muted/50"
                     />
                   </div>
-                ))}
-              </div>
-
-              <div>
-                <Label htmlFor="notes" className="text-xs font-bold text-muted-foreground uppercase mb-1">
-                  Notes
-                </Label>
-                <Textarea
-                  id="notes"
-                  rows={2}
-                  value={medicalUpdate.teamMedicalConditions}
-                  onChange={(e) => setMedicalUpdate({ ...medicalUpdate, teamMedicalConditions: e.target.value })}
-                  className="bg-muted/50 border-border focus-visible:border-primary transition-all resize-none"
-                />
-              </div>
-
-              <div className="pt-4 border-t border-border">
-                <h4 className="text-xs font-bold text-primary mb-4 uppercase">Doctor Plan</h4>
-                <div className="flex gap-4 mb-6">
-                  <Button
-                    type="button"
-                    onClick={() => setMedicalUpdate({ ...medicalUpdate, meetDoctor: 'yes' })}
-                    variant={medicalUpdate.meetDoctor === 'yes' ? 'default' : 'outline'}
-                    className="flex-1 gap-2"
-                  >
-                    <UserCheck size={18} />
-                    Yes
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setMedicalUpdate({ ...medicalUpdate, meetDoctor: 'no' })}
-                    variant={medicalUpdate.meetDoctor === 'no' ? 'default' : 'outline'}
-                    className="flex-1 gap-2"
-                  >
-                    <UserMinus size={18} />
-                    No
-                  </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="nadi" className="text-sm font-bold">
+                      Pulse (Nadi)
+                    </Label>
+                    <Input
+                      id="nadi"
+                      type="text"
+                      placeholder="e.g. 72 bpm"
+                      value={medicalUpdate.nadi}
+                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, nadi: e.target.value })}
+                      className="bg-muted/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="oksigen" className="text-sm font-bold">
+                      Oxygen Saturation
+                    </Label>
+                    <Input
+                      id="oksigen"
+                      type="text"
+                      placeholder="e.g. 98%"
+                      value={medicalUpdate.oksigen}
+                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, oksigen: e.target.value })}
+                      className="bg-muted/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="bloodSugar" className="text-sm font-bold">
+                      Blood Sugar
+                    </Label>
+                    <Input
+                      id="bloodSugar"
+                      type="text"
+                      placeholder="e.g. 95 mg/dL"
+                      value={medicalUpdate.bloodSugar}
+                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, bloodSugar: e.target.value })}
+                      className="bg-muted/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cholesterol" className="text-sm font-bold">
+                      Cholesterol
+                    </Label>
+                    <Input
+                      id="cholesterol"
+                      type="text"
+                      placeholder="e.g. 180 mg/dL"
+                      value={medicalUpdate.cholesterol}
+                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, cholesterol: e.target.value })}
+                      className="bg-muted/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="uricAcid" className="text-sm font-bold">
+                      Uric Acid
+                    </Label>
+                    <Input
+                      id="uricAcid"
+                      type="text"
+                      placeholder="e.g. 5.5 mg/dL"
+                      value={medicalUpdate.uricAcid}
+                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, uricAcid: e.target.value })}
+                      className="bg-muted/50"
+                    />
+                  </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="teamMedicalConditions" className="text-sm font-bold">
+                    Medical Team Notes
+                  </Label>
+                  <Textarea
+                    id="teamMedicalConditions"
+                    rows={4}
+                    placeholder="Additional notes from medical team..."
+                    value={medicalUpdate.teamMedicalConditions}
+                    onChange={(e) => setMedicalUpdate({ ...medicalUpdate, teamMedicalConditions: e.target.value })}
+                    className="bg-muted/50 resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+              <div className="bg-primary/5 p-4 border-b border-border flex items-center gap-2">
+                <UserCheck size={18} className="text-primary" />
+                <h3 className="font-bold text-primary">Doctor Appointment</h3>
+              </div>
+              <div className="p-4 space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-bold">Does patient need to meet doctor?</Label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="meetDoctor"
+                        value="yes"
+                        checked={medicalUpdate.meetDoctor === 'yes'}
+                        onChange={(e) => setMedicalUpdate({ ...medicalUpdate, meetDoctor: e.target.value })}
+                        className="w-4 h-4 text-primary"
+                      />
+                      <span className="text-sm">Yes</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="meetDoctor"
+                        value="no"
+                        checked={medicalUpdate.meetDoctor === 'no'}
+                        onChange={(e) => setMedicalUpdate({ ...medicalUpdate, meetDoctor: e.target.value })}
+                        className="w-4 h-4 text-primary"
+                      />
+                      <span className="text-sm">No</span>
+                    </label>
+                  </div>
+                </div>
+
                 {medicalUpdate.meetDoctor === 'yes' && (
                   <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      type="date"
-                      value={medicalUpdate.meetingDate}
-                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, meetingDate: e.target.value })}
-                      className="border-0 border-b border-border rounded-none focus-visible:ring-0 focus-visible:border-primary focus-visible:border-b-2 transition-all bg-transparent px-0"
-                    />
-                    <Input
-                      type="time"
-                      value={medicalUpdate.meetingTime}
-                      onChange={(e) => setMedicalUpdate({ ...medicalUpdate, meetingTime: e.target.value })}
-                      className="border-0 border-b border-border rounded-none focus-visible:ring-0 focus-visible:border-primary focus-visible:border-b-2 transition-all bg-transparent px-0"
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="meetingDate" className="text-sm font-bold">
+                        Meeting Date
+                      </Label>
+                      <Input
+                        id="meetingDate"
+                        type="date"
+                        value={medicalUpdate.meetingDate}
+                        onChange={(e) => setMedicalUpdate({ ...medicalUpdate, meetingDate: e.target.value })}
+                        className="bg-muted/50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="meetingTime" className="text-sm font-bold">
+                        Meeting Time
+                      </Label>
+                      <Input
+                        id="meetingTime"
+                        type="time"
+                        value={medicalUpdate.meetingTime}
+                        onChange={(e) => setMedicalUpdate({ ...medicalUpdate, meetingTime: e.target.value })}
+                        className="bg-muted/50"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
+            </div>
 
-              <Button type="submit" disabled={updateSubmission.isPending} className="w-full py-6 font-bold shadow-lg">
-                {updateSubmission.isPending ? (
-                  'Saving...'
-                ) : (
-                  <>
-                    <Save className="mr-2 h-5 w-5" />
-                    Finish & Save
-                  </>
-                )}
-              </Button>
-            </form>
-          </div>
+            <Button type="submit" disabled={updateSubmission.isPending} className="w-full py-6 text-lg font-bold shadow-lg">
+              {updateSubmission.isPending ? (
+                'Saving...'
+              ) : (
+                <>
+                  <Save className="mr-2 h-5 w-5" />
+                  Save Medical Examination
+                </>
+              )}
+            </Button>
+          </form>
         </div>
       </div>
     </div>

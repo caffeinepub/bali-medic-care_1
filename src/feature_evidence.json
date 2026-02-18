@@ -2,11 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-patient-form-submission-flow-to-use-the-backend-returned-submission-id-and-show-an-actionable-error-message-when-submission-fails-including-surfacing-the-backend-error-trap-reason-in-console-logs-while-keeping-the-current-toast-text-in-english",
-      "featureTitle": "Update the patient form submission flow to use the backend-returned submission id and show an actionable error message when submission fails (including surfacing the backend error/trap reason in console logs) while keeping the current toast text in English.",
+      "featureId": "feature-update-the-team-management-page-patient-details-card-to-display-all-available-fields-from-the-selected-patientsubmission-not-just-name-room-nationality-whatsapp-symptoms-using-structured-fields-when-present-and-falling-back-to-parsing-detailedinfo-context-only-when-structured-fields-are-missing",
+      "featureTitle": "Update the Team Management page \"Patient Details\" card to display all available fields from the selected PatientSubmission (not just name/room/nationality/WhatsApp/symptoms), using structured fields when present and falling back to parsing detailedInfo.context only when structured fields are missing.",
       "files": [
-        "frontend/src/hooks/useSubmissions.ts",
-        "frontend/src/pages/PatientFormPage.tsx"
+        "frontend/src/components/team/PatientDetailsCard.tsx",
+        "frontend/src/pages/TeamManagementPage.tsx",
+        "frontend/src/utils/patientSubmissionDetails.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,17 +18,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-14"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-minimal-regression-check-in-the-medical-team-dashboard-data-flow-so-that-newly-submitted-patient-records-can-be-retrieved-and-displayed-after-a-successful-submission-no-code-path-relies-on-client-sent-id-0",
-      "featureTitle": "Add a minimal regression check in the medical team dashboard data flow so that newly submitted patient records can be retrieved and displayed after a successful submission (no code path relies on client-sent id=0).",
+      "featureId": "feature-render-questionnaire-response-data-responsessectiona-and-responsessectionb-in-the-patient-details-view-in-a-readable-format-e-g-tables-or-definition-lists-including-each-response-s-scoretype-selected-answer-text-score-and-feedbacktext-when-present",
+      "featureTitle": "Render questionnaire response data (responsesSectionA and responsesSectionB) in the Patient Details view in a readable format (e.g., tables or definition lists), including each response's scoreType, selected answer text, score, and feedbackText when present.",
       "files": [
-        "frontend/src/components/dashboard/SubmissionsTable.tsx",
-        "frontend/src/hooks/useSubmissions.ts",
-        "frontend/src/pages/DashboardPage.tsx"
+        "frontend/src/components/team/PatientDetailsCard.tsx",
+        "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+        "frontend/src/pages/TeamManagementPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,7 +39,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-15"
+        "REQ-2"
       ],
       "confidence": "high"
     }

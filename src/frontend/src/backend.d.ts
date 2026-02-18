@@ -42,12 +42,21 @@ export interface PatientSubmission {
     responsesSectionB: Array<QuestionResponse>;
     notes?: string;
     detailedInfo: DetailedInfo;
+    personalInfo: PersonalInfo;
 }
 export type TimestampType = bigint;
 export interface DetailedInfo {
     context?: string;
     date?: string;
     time?: string;
+}
+export interface PersonalInfo {
+    country: string;
+    medicalConditions: string;
+    fullName: string;
+    roomNumber: string;
+    whatsappNumber: string;
+    symptoms: string;
 }
 export interface QuestionResponse {
     feedbackText?: string;
@@ -80,14 +89,14 @@ export interface Section {
     heading: string;
     questions: Array<Question>;
 }
+export interface PatientScore {
+    obstructiveScore?: bigint;
+    centralScore?: bigint;
+}
 export interface Question {
     text: string;
     scoreType?: string;
     options: Array<AnswerOption>;
-}
-export interface PatientScore {
-    obstructiveScore?: bigint;
-    centralScore?: bigint;
 }
 export interface UserProfile {
     name: string;
@@ -129,4 +138,6 @@ export interface backendInterface {
     saveClinicConfig(clinicId: string, config: ClinicConfig): Promise<void>;
     submitPatientForm(submission: PatientSubmission): Promise<bigint>;
     updateClinicMembers(clinicId: string, members: Array<ClinicMember>): Promise<void>;
+    updatePatientPersonalInfo(submissionId: bigint, personalInfo: PersonalInfo): Promise<void>;
+    updatePatientSubmission(submissionId: bigint, updatedSubmission: PatientSubmission): Promise<void>;
 }

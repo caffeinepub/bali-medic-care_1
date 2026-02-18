@@ -1,7 +1,8 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { CheckCircle2, ArrowLeft, MapPin, ExternalLink, Star } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, MessageSquare, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGetAllPatientSubmissions } from '@/hooks/useSubmissions';
+import { buildWhatsAppUrl } from '@/utils/whatsapp';
 
 export default function ExamSuccessPage() {
   const navigate = useNavigate();
@@ -20,7 +21,18 @@ export default function ExamSuccessPage() {
     ? extractField(selectedPatient.detailedInfo.context || '', 'Name') || 'Patient'
     : 'Patient';
 
-  const googleMapsUrl = 'https://share.google/FHNcPzGbdwQSjKj3n';
+  const whatsappNumber = selectedPatient
+    ? extractField(selectedPatient.detailedInfo.context || '', 'WhatsApp') || ''
+    : '';
+
+  const handleSendWhatsApp = () => {
+    if (!selectedPatient) return;
+    
+    const whatsappUrl = buildWhatsAppUrl(selectedPatient);
+    if (whatsappUrl) {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
     <div className="bg-muted/30 min-h-[calc(100vh-8rem)] py-8">
@@ -36,27 +48,32 @@ export default function ExamSuccessPage() {
               successfully.
             </p>
 
-            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl p-6 border border-amber-200 dark:border-amber-800 mb-8">
-              <div className="flex justify-center mb-4 gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="text-amber-400 fill-amber-400" size={28} />
-                ))}
+            {whatsappNumber ? (
+              <div className="bg-green-50 dark:bg-green-950/30 rounded-2xl p-6 border border-green-200 dark:border-green-800 mb-8">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
+                    <MessageSquare size={32} />
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-2">Send Results to Patient</h2>
+                <p className="text-green-800 dark:text-green-200 text-sm mb-6">
+                  Click below to send the complete examination results and review request via WhatsApp.
+                </p>
+                <Button
+                  onClick={handleSendWhatsApp}
+                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-6 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all w-full justify-center"
+                >
+                  <Send size={20} />
+                  Send Results via WhatsApp
+                </Button>
               </div>
-              <h2 className="text-2xl font-bold text-amber-900 dark:text-amber-100 mb-2">Help us grow!</h2>
-              <p className="text-amber-800 dark:text-amber-200 text-sm mb-6">
-                Please ask the patient to leave a 5-star review on our Google Maps profile.
-              </p>
-              <a
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all w-full justify-center"
-              >
-                <MapPin size={20} />
-                Review on Google Maps
-                <ExternalLink size={16} />
-              </a>
-            </div>
+            ) : (
+              <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl p-6 border border-amber-200 dark:border-amber-800 mb-8">
+                <p className="text-amber-800 dark:text-amber-200 text-sm mb-4">
+                  WhatsApp number not available. Please ask the patient to leave a review manually.
+                </p>
+              </div>
+            )}
 
             <Button variant="ghost" onClick={() => navigate({ to: '/dashboard' })} className="gap-2">
               <ArrowLeft size={18} />

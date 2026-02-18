@@ -3,8 +3,10 @@ import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
+
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+
 
 actor {
   type AnswerOption = {
@@ -52,9 +54,6 @@ actor {
     gender : ?Text;
   };
 
-  let patientSubmissions = Map.empty<Nat, PatientSubmission>();
-  var lastSubmissionId = 0;
-
   module PatientSubmission {
     public type TimestampType = Int;
 
@@ -75,6 +74,15 @@ actor {
       context : ?Text;
     };
 
+    public type PersonalInfo = {
+      fullName : Text;
+      country : Text;
+      roomNumber : Text;
+      whatsappNumber : Text;
+      medicalConditions : Text;
+      symptoms : Text;
+    };
+
     public type SubmissionStatus = {
       #inProgress;
       #completed;
@@ -86,6 +94,7 @@ actor {
       clinicId : Text;
       patientId : ?Text;
       demographic : DemographicData;
+      personalInfo : PersonalInfo;
       submissionStatus : SubmissionStatus;
       initialScore : {
         obstructive : Int;
@@ -110,6 +119,10 @@ actor {
   };
 
   public type PatientSubmission = PatientSubmission.Submission;
+  public type PersonalInfo = PatientSubmission.PersonalInfo;
+
+  let patientSubmissions = Map.empty<Nat, PatientSubmission>();
+  var lastSubmissionId = 0;
 
   type Professional = {
     name : Text;
@@ -242,7 +255,6 @@ actor {
     // Public access - patient registration form is accessible to everyone (guests)
     // No authorization check needed per implementation plan
 
-    // Remove default config check
     lastSubmissionId += 1;
     let submissionWithServerAssignedId = {
       submission with id = lastSubmissionId;
@@ -252,23 +264,59 @@ actor {
     lastSubmissionId;
   };
 
+  public shared ({ caller }) func updatePatientSubmission(submissionId : Nat, updatedSubmission : PatientSubmission) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated medical team users can update patient submissions");
+    };
+    switch (patientSubmissions.get(submissionId)) {
+      case (?existingSubmission) {
+        // Ensure the ID matches to prevent ID tampering
+        if (updatedSubmission.id != submissionId) {
+          Runtime.trap("Submission ID mismatch");
+        };
+        patientSubmissions.add(submissionId, updatedSubmission);
+      };
+      case (null) {
+        Runtime.trap("Submission not found");
+      };
+    };
+  };
+
+  public shared ({ caller }) func updatePatientPersonalInfo(submissionId : Nat, personalInfo : PersonalInfo) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated medical team users can update patient info");
+    };
+    switch (patientSubmissions.get(submissionId)) {
+      case (?existingSubmission) {
+        let updatedSubmission = {
+          existingSubmission with
+          personalInfo
+        };
+        patientSubmissions.add(submissionId, updatedSubmission);
+      };
+      case (null) {
+        Runtime.trap("Submission not found");
+      };
+    };
+  };
+
   public query ({ caller }) func getPatientSubmission(id : Nat) : async ?PatientSubmission {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view patient submissions");
+      Runtime.trap("Unauthorized: Only authenticated medical team users can view patient submissions");
     };
     patientSubmissions.get(id);
   };
 
   public query ({ caller }) func getAllPatientSubmissions() : async [PatientSubmission] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view patient submissions");
+      Runtime.trap("Unauthorized: Only authenticated medical team users can view patient submissions");
     };
     patientSubmissions.values().toArray();
   };
 
   public query ({ caller }) func getFilteredPatientSubmissions(filterType : Text) : async [PatientSubmission] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view patient submissions");
+      Runtime.trap("Unauthorized: Only authenticated medical team users can view patient submissions");
     };
     switch (filterType) {
       case (_) {

@@ -68,6 +68,14 @@ export const DetailedInfo = IDL.Record({
   'date' : IDL.Opt(IDL.Text),
   'time' : IDL.Opt(IDL.Text),
 });
+export const PersonalInfo = IDL.Record({
+  'country' : IDL.Text,
+  'medicalConditions' : IDL.Text,
+  'fullName' : IDL.Text,
+  'roomNumber' : IDL.Text,
+  'whatsappNumber' : IDL.Text,
+  'symptoms' : IDL.Text,
+});
 export const PatientSubmission = IDL.Record({
   'id' : IDL.Nat,
   'additionalInfo' : IDL.Opt(IDL.Text),
@@ -90,6 +98,7 @@ export const PatientSubmission = IDL.Record({
   'responsesSectionB' : IDL.Vec(QuestionResponse),
   'notes' : IDL.Opt(IDL.Text),
   'detailedInfo' : DetailedInfo,
+  'personalInfo' : PersonalInfo,
 });
 export const Professional = IDL.Record({
   'id' : IDL.Text,
@@ -151,6 +160,8 @@ export const idlService = IDL.Service({
   'saveClinicConfig' : IDL.Func([IDL.Text, ClinicConfig], [], []),
   'submitPatientForm' : IDL.Func([PatientSubmission], [IDL.Nat], []),
   'updateClinicMembers' : IDL.Func([IDL.Text, IDL.Vec(ClinicMember)], [], []),
+  'updatePatientPersonalInfo' : IDL.Func([IDL.Nat, PersonalInfo], [], []),
+  'updatePatientSubmission' : IDL.Func([IDL.Nat, PatientSubmission], [], []),
 });
 
 export const idlInitArgs = [];
@@ -216,6 +227,14 @@ export const idlFactory = ({ IDL }) => {
     'date' : IDL.Opt(IDL.Text),
     'time' : IDL.Opt(IDL.Text),
   });
+  const PersonalInfo = IDL.Record({
+    'country' : IDL.Text,
+    'medicalConditions' : IDL.Text,
+    'fullName' : IDL.Text,
+    'roomNumber' : IDL.Text,
+    'whatsappNumber' : IDL.Text,
+    'symptoms' : IDL.Text,
+  });
   const PatientSubmission = IDL.Record({
     'id' : IDL.Nat,
     'additionalInfo' : IDL.Opt(IDL.Text),
@@ -241,6 +260,7 @@ export const idlFactory = ({ IDL }) => {
     'responsesSectionB' : IDL.Vec(QuestionResponse),
     'notes' : IDL.Opt(IDL.Text),
     'detailedInfo' : DetailedInfo,
+    'personalInfo' : PersonalInfo,
   });
   const Professional = IDL.Record({
     'id' : IDL.Text,
@@ -314,6 +334,8 @@ export const idlFactory = ({ IDL }) => {
     'saveClinicConfig' : IDL.Func([IDL.Text, ClinicConfig], [], []),
     'submitPatientForm' : IDL.Func([PatientSubmission], [IDL.Nat], []),
     'updateClinicMembers' : IDL.Func([IDL.Text, IDL.Vec(ClinicMember)], [], []),
+    'updatePatientPersonalInfo' : IDL.Func([IDL.Nat, PersonalInfo], [], []),
+    'updatePatientSubmission' : IDL.Func([IDL.Nat, PatientSubmission], [], []),
   });
 };
 

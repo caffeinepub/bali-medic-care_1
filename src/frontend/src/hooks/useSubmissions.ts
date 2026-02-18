@@ -18,12 +18,18 @@ export function useGetAllPatientSubmissions() {
 }
 
 export function useSubmitPatientForm() {
-  const { actor } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation<bigint, Error, PatientSubmission>({
     mutationFn: async (submission: PatientSubmission) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) {
+        throw new Error('Actor not available - backend connection not initialized');
+      }
+      if (actorFetching) {
+        throw new Error('Actor is still initializing - please wait');
+      }
+      
       const submissionId = await actor.submitPatientForm(submission);
       return submissionId;
     },
@@ -31,24 +37,43 @@ export function useSubmitPatientForm() {
       console.log('✅ Patient form submitted successfully with ID:', submissionId.toString());
       queryClient.invalidateQueries({ queryKey: ['patientSubmissions'] });
     },
+    onError: (error) => {
+      console.error('❌ useSubmitPatientForm mutation error:', {
+        message: error.message,
+        name: error.name,
+        actorAvailable: !!actor,
+        actorFetching,
+      });
+    },
   });
 }
 
 export function useUpdatePatientSubmission() {
-  const { actor } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
   const queryClient = useQueryClient();
 
-  return useMutation<bigint, Error, PatientSubmission>({
+  return useMutation<void, Error, PatientSubmission>({
     mutationFn: async (submission: PatientSubmission) => {
-      if (!actor) throw new Error('Actor not available');
-      // Note: Backend doesn't have an update method, so we're using the context field
-      // to store all the data. In a real app, you'd add an updatePatientSubmission method.
-      const submissionId = await actor.submitPatientForm(submission);
-      return submissionId;
+      if (!actor) {
+        throw new Error('Actor not available - backend connection not initialized');
+      }
+      if (actorFetching) {
+        throw new Error('Actor is still initializing - please wait');
+      }
+      
+      await actor.updatePatientSubmission(submission.id, submission);
     },
-    onSuccess: (submissionId) => {
-      console.log('✅ Patient submission updated successfully with ID:', submissionId.toString());
+    onSuccess: (_, variables) => {
+      console.log('✅ Patient submission updated successfully with ID:', variables.id.toString());
       queryClient.invalidateQueries({ queryKey: ['patientSubmissions'] });
+    },
+    onError: (error) => {
+      console.error('❌ useUpdatePatientSubmission mutation error:', {
+        message: error.message,
+        name: error.name,
+        actorAvailable: !!actor,
+        actorFetching,
+      });
     },
   });
 }

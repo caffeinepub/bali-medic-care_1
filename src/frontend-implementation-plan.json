@@ -1,52 +1,57 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix patient form submission flow to use backend id and improve dashboard retrieval robustness",
+  "title": "Clinic Exam Sender — Expand Patient Details to show full PatientSubmission fields and questionnaire responses",
   "requirements": [
     {
-      "id": "REQ-14",
-      "summary": "Use backend-returned submission id in the patient form flow and improve failure diagnostics while keeping the existing English toast text.",
+      "id": "REQ-1",
+      "summary": "Expand the /team Patient Details card to display all available PatientSubmission fields with structured-first rendering and safe fallback parsing from detailedInfo.context when structured fields are missing.",
       "acceptanceCriteria": [
-        "On successful submit, the app navigates to /success as it does today.",
-        "On failure, the user still sees the toast: \"Failed to submit form. Please try again.\"",
-        "On failure, the browser console logs include the underlying error details sufficient to debug (not only a generic message).",
-        "The mutation uses the backend response (Nat id) appropriately (e.g., storing/handling the returned id rather than assuming id=0)."
+        "When a submission is selected on /team, the Patient Details section shows, at minimum: id, clinicId, patientId (if present), submissionStatus, personalInfo (fullName, country, roomNumber, whatsappNumber, medicalConditions, symptoms), demographic (age, unitOfMeasure, gestationalAge, gender), timestamps (submission/recorded/followUp where present), detailedInfo (date, time, context where present), initialScore, summary (score + status), feedbackCode (if present), notes (if present), additionalInfo (if present).",
+        "For older submissions that may have missing structured personalInfo fields, the UI still shows the best-available patient details by falling back to extracting values from detailedInfo.context, without breaking the page.",
+        "All user-facing labels in the expanded Patient Details view are in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/PatientFormPage.tsx",
-          "operation": "modify",
-          "description": "Capture the bigint submission id returned by the backend call, validate it is non-zero, and log it for traceability before navigating to /success; on errors, keep the existing English toast text while expanding console logging to include raw error objects and any nested/cause details (to surface backend trap reasons)."
+          "path": "frontend/src/utils/patientSubmissionDetails.ts",
+          "operation": "create",
+          "description": "Add display-focused helpers to derive a complete, best-available Patient Details view-model from a PatientSubmission: prefer structured fields (personalInfo/demographic/timestamps/etc.) and safely fall back to parsing detailedInfo.context only for missing values; include defensive parsing/formatting (bigint to string, optional timestamps) to prevent runtime errors."
         },
         {
-          "path": "frontend/src/hooks/useSubmissions.ts",
+          "path": "frontend/src/components/team/PatientDetailsCard.tsx",
+          "operation": "create",
+          "description": "Create a composed PatientDetailsCard component to render the full PatientSubmission details using readable structured layouts (e.g., definition lists/sections) and English labels; consume the view-model from frontend/src/utils/patientSubmissionDetails.ts. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/TeamManagementPage.tsx",
           "operation": "modify",
-          "description": "Type and document the submit mutation return value as the backend-returned bigint id, ensuring callers can rely on the response; keep query invalidation on success and avoid any client-side assumptions that the id is 0."
+          "description": "Replace/extend the current inline Patient Details UI to use PatientDetailsCard and show all required fields (id/clinicId/patientId/submissionStatus/personalInfo/demographic/timestamps/detailedInfo/initialScore/summary/feedbackCode/notes/additionalInfo); keep existing WhatsApp button behavior and ensure fallback parsing is only used when structured fields are missing."
         }
       ]
     },
     {
-      "id": "REQ-15",
-      "summary": "Add a minimal regression check to ensure the dashboard retrieves and displays newly submitted records and navigation uses the backend id (not a client-sent placeholder).",
+      "id": "REQ-2",
+      "summary": "Render responsesSectionA and responsesSectionB in Patient Details with readable per-response fields and clear empty states.",
       "acceptanceCriteria": [
-        "After a successful patient submission, an authenticated medical team user can open /dashboard and see the new submission listed.",
-        "Selecting the new submission from the table navigates to /team with the correct submissionId parameter (non-zero, matching the saved submission)."
+        "Patient Details includes visible sections for Section A responses and Section B responses.",
+        "Each displayed response includes: scoreType (or a clear placeholder like \"N/A\"), answer.text, answer.score, and feedbackText (if present).",
+        "If a section has zero responses, the UI shows a clear English empty state for that section (e.g., \"No responses recorded\")."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useSubmissions.ts",
-          "operation": "modify",
-          "description": "Adjust the dashboard submissions query behavior to reliably refetch when the dashboard is opened (e.g., ensure refetch-on-mount/short staleness) so newly created submissions are retrieved without requiring any client-generated id assumptions."
+          "path": "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+          "operation": "create",
+          "description": "Create a QuestionnaireResponsesSection component that renders a section title (Section A / Section B) and a readable list/table/definition-list of QuestionResponse items showing scoreType (or \"N/A\"), answer.text, answer.score, and feedbackText when present; include an English empty state when no responses exist. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/DashboardPage.tsx",
+          "path": "frontend/src/components/team/PatientDetailsCard.tsx",
           "operation": "modify",
-          "description": "Add a minimal runtime regression check in the dashboard data flow: warn in the console if any retrieved submission has id=0, and ensure selection/navigation continues to use the backend-provided submission.id when navigating to /team."
+          "description": "Integrate QuestionnaireResponsesSection into the expanded Patient Details rendering to display responsesSectionA and responsesSectionB under clearly labeled subsections with the required fields and empty states. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/components/dashboard/SubmissionsTable.tsx",
+          "path": "frontend/src/pages/TeamManagementPage.tsx",
           "operation": "modify",
-          "description": "Harden rendering expectations around ids by ensuring list keys and click-selection operate on submission.id.toString() and optionally emitting a console warning if a submission with id=0 is encountered (without changing user-facing text)."
+          "description": "Wire the updated PatientDetailsCard (now including questionnaire responses sections) into the /team page so that selecting a submission reliably shows both Section A and Section B responses (or English empty states) in Patient Details."
         }
       ]
     }

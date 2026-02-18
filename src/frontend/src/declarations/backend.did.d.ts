@@ -65,6 +65,15 @@ export interface PatientSubmission {
   'responsesSectionB' : Array<QuestionResponse>,
   'notes' : [] | [string],
   'detailedInfo' : DetailedInfo,
+  'personalInfo' : PersonalInfo,
+}
+export interface PersonalInfo {
+  'country' : string,
+  'medicalConditions' : string,
+  'fullName' : string,
+  'roomNumber' : string,
+  'whatsappNumber' : string,
+  'symptoms' : string,
 }
 export interface Professional {
   'id' : string,
@@ -124,6 +133,11 @@ export interface _SERVICE {
   'saveClinicConfig' : ActorMethod<[string, ClinicConfig], undefined>,
   'submitPatientForm' : ActorMethod<[PatientSubmission], bigint>,
   'updateClinicMembers' : ActorMethod<[string, Array<ClinicMember>], undefined>,
+  'updatePatientPersonalInfo' : ActorMethod<[bigint, PersonalInfo], undefined>,
+  'updatePatientSubmission' : ActorMethod<
+    [bigint, PatientSubmission],
+    undefined
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

@@ -8,11 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import FormSectionCard from '@/components/forms/FormSectionCard';
 import RequiredMarker from '@/components/forms/RequiredMarker';
 import { useSubmitPatientForm } from '@/hooks/useSubmissions';
+import { useActor } from '@/hooks/useActor';
 import { SubmissionStatus } from '@/backend';
 import { toast } from 'sonner';
 
 export default function PatientFormPage() {
   const navigate = useNavigate();
+  const { actor, isFetching: actorFetching } = useActor();
   const submitForm = useSubmitPatientForm();
 
   const [formData, setFormData] = useState({
@@ -23,11 +25,20 @@ export default function PatientFormPage() {
     patientMedicalConditions: '',
   });
 
+  const isActorReady = !!actor && !actorFetching;
+  const isSubmitting = submitForm.isPending;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!isActorReady) {
+      console.error('❌ Actor not ready for submission', { actor: !!actor, actorFetching });
+      toast.error('System is initializing. Please wait a moment and try again.');
+      return;
+    }
+
     try {
-      console.log('📤 Submitting patient form...');
+      console.log('📤 Submitting patient form with structured personalInfo...');
       
       const submissionId = await submitForm.mutateAsync({
         id: BigInt(0),
@@ -38,6 +49,14 @@ export default function PatientFormPage() {
           unitOfMeasure: undefined,
           gestationalAge: undefined,
           gender: undefined,
+        },
+        personalInfo: {
+          fullName: formData.name,
+          country: formData.nationality,
+          roomNumber: formData.roomNumber,
+          whatsappNumber: formData.whatsapp,
+          medicalConditions: formData.patientMedicalConditions,
+          symptoms: formData.patientMedicalConditions,
         },
         submissionStatus: SubmissionStatus.inProgress,
         initialScore: {
@@ -87,13 +106,10 @@ export default function PatientFormPage() {
         name: error?.name,
         stack: error?.stack,
         cause: error?.cause,
-        raw: error,
+        actorReady: isActorReady,
+        actorExists: !!actor,
+        actorFetching,
       });
-      
-      // Log additional context if available
-      if (error?.message) {
-        console.error('Error message:', error.message);
-      }
       
       toast.error('Failed to submit form. Please try again.');
     }
@@ -237,10 +253,12 @@ export default function PatientFormPage() {
 
           <Button
             type="submit"
-            disabled={submitForm.isPending}
+            disabled={!isActorReady || isSubmitting}
             className="w-full py-6 text-lg font-bold shadow-lg"
           >
-            {submitForm.isPending ? (
+            {!isActorReady ? (
+              'Initializing...'
+            ) : isSubmitting ? (
               'Submitting...'
             ) : (
               <>

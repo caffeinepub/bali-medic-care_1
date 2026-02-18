@@ -1,62 +1,56 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T07:20:05.495Z",
+  "generatedAt": "2026-02-18T09:10:59.512Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 2,
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-13",
-        "summary": "Fix the backend patient submission endpoint so public patient form submissions do not fail when no default clinic config exists, and ensure each saved submission receives a unique server-assigned id.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-14",
-        "summary": "Update the patient form submission flow to use the backend-returned submission id and show an actionable error message when submission fails (including surfacing the backend error/trap reason in console logs) while keeping the current toast text in English.",
+        "id": "REQ-1",
+        "summary": "Update the Team Management page \"Patient Details\" card to display all available fields from the selected PatientSubmission (not just name/room/nationality/WhatsApp/symptoms), using structured fields when present and falling back to parsing detailedInfo.context only when structured fields are missing.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/PatientFormPage.tsx",
-          "frontend/src/hooks/useSubmissions.ts"
+          "frontend/src/utils/patientSubmissionDetails.ts",
+          "frontend/src/components/team/PatientDetailsCard.tsx",
+          "frontend/src/pages/TeamManagementPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/PatientFormPage.tsx",
-          "frontend/src/hooks/useSubmissions.ts"
+          "frontend/src/utils/patientSubmissionDetails.ts",
+          "frontend/src/components/team/PatientDetailsCard.tsx",
+          "frontend/src/pages/TeamManagementPage.tsx"
         ]
       },
       {
-        "id": "REQ-15",
-        "summary": "Add a minimal regression check in the medical team dashboard data flow so that newly submitted patient records can be retrieved and displayed after a successful submission (no code path relies on client-sent id=0).",
+        "id": "REQ-2",
+        "summary": "Render questionnaire response data (responsesSectionA and responsesSectionB) in the Patient Details view in a readable format (e.g., tables or definition lists), including each response's scoreType, selected answer text, score, and feedbackText when present.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useSubmissions.ts",
-          "frontend/src/pages/DashboardPage.tsx",
-          "frontend/src/components/dashboard/SubmissionsTable.tsx"
+          "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+          "frontend/src/components/team/PatientDetailsCard.tsx",
+          "frontend/src/pages/TeamManagementPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useSubmissions.ts",
-          "frontend/src/pages/DashboardPage.tsx",
-          "frontend/src/components/dashboard/SubmissionsTable.tsx"
+          "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+          "frontend/src/components/team/PatientDetailsCard.tsx",
+          "frontend/src/pages/TeamManagementPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/dashboard/SubmissionsTable.tsx",
-    "frontend/src/hooks/useSubmissions.ts",
-    "frontend/src/pages/DashboardPage.tsx",
-    "frontend/src/pages/PatientFormPage.tsx",
+    "frontend/src/components/team/PatientDetailsCard.tsx",
+    "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+    "frontend/src/pages/TeamManagementPage.tsx",
+    "frontend/src/utils/patientSubmissionDetails.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

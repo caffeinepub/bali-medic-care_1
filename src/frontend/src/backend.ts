@@ -124,12 +124,21 @@ export interface PatientSubmission {
     responsesSectionB: Array<QuestionResponse>;
     notes?: string;
     detailedInfo: DetailedInfo;
+    personalInfo: PersonalInfo;
 }
 export type TimestampType = bigint;
 export interface DetailedInfo {
     context?: string;
     date?: string;
     time?: string;
+}
+export interface PersonalInfo {
+    country: string;
+    medicalConditions: string;
+    fullName: string;
+    roomNumber: string;
+    whatsappNumber: string;
+    symptoms: string;
 }
 export interface QuestionResponse {
     feedbackText?: string;
@@ -162,14 +171,14 @@ export interface Section {
     heading: string;
     questions: Array<Question>;
 }
+export interface PatientScore {
+    obstructiveScore?: bigint;
+    centralScore?: bigint;
+}
 export interface Question {
     text: string;
     scoreType?: string;
     options: Array<AnswerOption>;
-}
-export interface PatientScore {
-    obstructiveScore?: bigint;
-    centralScore?: bigint;
 }
 export interface UserProfile {
     name: string;
@@ -212,8 +221,10 @@ export interface backendInterface {
     saveClinicConfig(clinicId: string, config: ClinicConfig): Promise<void>;
     submitPatientForm(submission: PatientSubmission): Promise<bigint>;
     updateClinicMembers(clinicId: string, members: Array<ClinicMember>): Promise<void>;
+    updatePatientPersonalInfo(submissionId: bigint, personalInfo: PersonalInfo): Promise<void>;
+    updatePatientSubmission(submissionId: bigint, updatedSubmission: PatientSubmission): Promise<void>;
 }
-import type { AnswerOption as _AnswerOption, ClinicConfig as _ClinicConfig, DemographicData as _DemographicData, DetailedInfo as _DetailedInfo, PatientAnswer as _PatientAnswer, PatientScore as _PatientScore, PatientSubmission as _PatientSubmission, Professional as _Professional, Question as _Question, QuestionResponse as _QuestionResponse, Section as _Section, SubmissionStatus as _SubmissionStatus, Timestamp as _Timestamp, TimestampType as _TimestampType, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { AnswerOption as _AnswerOption, ClinicConfig as _ClinicConfig, DemographicData as _DemographicData, DetailedInfo as _DetailedInfo, PatientAnswer as _PatientAnswer, PatientScore as _PatientScore, PatientSubmission as _PatientSubmission, PersonalInfo as _PersonalInfo, Professional as _Professional, Question as _Question, QuestionResponse as _QuestionResponse, Section as _Section, SubmissionStatus as _SubmissionStatus, Timestamp as _Timestamp, TimestampType as _TimestampType, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -510,6 +521,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updatePatientPersonalInfo(arg0: bigint, arg1: PersonalInfo): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updatePatientPersonalInfo(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updatePatientPersonalInfo(arg0, arg1);
+            return result;
+        }
+    }
+    async updatePatientSubmission(arg0: bigint, arg1: PatientSubmission): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updatePatientSubmission(arg0, to_candid_PatientSubmission_n57(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updatePatientSubmission(arg0, to_candid_PatientSubmission_n57(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
 }
 function from_candid_AnswerOption_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _AnswerOption): AnswerOption {
     return from_candid_record_n15(_uploadFile, _downloadFile, value);
@@ -629,6 +668,7 @@ function from_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uin
     responsesSectionB: Array<_QuestionResponse>;
     notes: [] | [string];
     detailedInfo: _DetailedInfo;
+    personalInfo: _PersonalInfo;
 }): {
     id: bigint;
     additionalInfo?: string;
@@ -654,6 +694,7 @@ function from_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uin
     responsesSectionB: Array<QuestionResponse>;
     notes?: string;
     detailedInfo: DetailedInfo;
+    personalInfo: PersonalInfo;
 } {
     return {
         id: value.id,
@@ -669,7 +710,8 @@ function from_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uin
         responsesSectionA: from_candid_vec_n35(_uploadFile, _downloadFile, value.responsesSectionA),
         responsesSectionB: from_candid_vec_n35(_uploadFile, _downloadFile, value.responsesSectionB),
         notes: record_opt_to_undefined(from_candid_opt_n12(_uploadFile, _downloadFile, value.notes)),
-        detailedInfo: from_candid_DetailedInfo_n38(_uploadFile, _downloadFile, value.detailedInfo)
+        detailedInfo: from_candid_DetailedInfo_n38(_uploadFile, _downloadFile, value.detailedInfo),
+        personalInfo: value.personalInfo
     };
 }
 function from_candid_record_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -964,6 +1006,7 @@ function to_candid_record_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8
     responsesSectionB: Array<QuestionResponse>;
     notes?: string;
     detailedInfo: DetailedInfo;
+    personalInfo: PersonalInfo;
 }): {
     id: bigint;
     additionalInfo: [] | [string];
@@ -989,6 +1032,7 @@ function to_candid_record_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8
     responsesSectionB: Array<_QuestionResponse>;
     notes: [] | [string];
     detailedInfo: _DetailedInfo;
+    personalInfo: _PersonalInfo;
 } {
     return {
         id: value.id,
@@ -1004,7 +1048,8 @@ function to_candid_record_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         responsesSectionA: to_candid_vec_n69(_uploadFile, _downloadFile, value.responsesSectionA),
         responsesSectionB: to_candid_vec_n69(_uploadFile, _downloadFile, value.responsesSectionB),
         notes: value.notes ? candid_some(value.notes) : candid_none(),
-        detailedInfo: to_candid_DetailedInfo_n72(_uploadFile, _downloadFile, value.detailedInfo)
+        detailedInfo: to_candid_DetailedInfo_n72(_uploadFile, _downloadFile, value.detailedInfo),
+        personalInfo: value.personalInfo
     };
 }
 function to_candid_record_n60(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

@@ -1,35 +1,44 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T07:20:05.492Z",
-  "summary": "Frontend updates add better console error logging on patient form submission failures, use the backend-returned submission id (as a bigint), and add runtime regression checks/warnings for id=0 in dashboard/table. However, the diff summary does not provide sufficient evidence that the backend endpoint was fixed to avoid trapping when no clinic config exists or that it now generates and persists unique non-zero submission ids.",
+  "generatedAt": "2026-02-18T09:10:59.509Z",
+  "summary": "The diff adds a new PatientDetailsCard component plus utilities to build a view-model with structured-field preference and context-string fallback, and adds a QuestionnaireResponsesSection component with an English empty state. However, due to truncation, several required fields/sections are not verifiably rendered in the Patient Details UI from the provided diff summary.",
   "missing_requirements": [
     {
-      "id": "REQ-13",
-      "requirement": "Fix the backend patient submission endpoint so public patient form submissions do not fail when no default clinic config exists, and ensure each saved submission receives a unique server-assigned id (non-zero) that matches the stored record id.",
-      "reason": "The backend file (backend/main.mo) is truncated and the diff summary does not show any implementation of the submitPatientForm endpoint logic, clinic-config fallback behavior, persistence behavior, or server-side id assignment/return semantics. Presence of `patientSubmissions` and `lastSubmissionId` alone is not evidence the endpoint now meets the acceptance criteria.",
+      "id": "REQ-1",
+      "requirement": "Patient Details card displays all minimum required PatientSubmission fields (demographic, timestamps, detailedInfo, initialScore, summary, feedbackCode, notes, additionalInfo) when a submission is selected on /team.",
+      "reason": "The new PatientDetailsCard.tsx excerpt only shows Basic Information (Submission ID, Clinic ID, Patient ID, Status) and part of Personal Information. The view-model utility computes demographic/timestamps/detailedInfo/initialScore/summaryScore, but the return object and the card rendering for the rest of the required fields are truncated, so their presence in the UI cannot be confirmed from the diff summary.",
       "evidence": [
-        "backend/main.mo (truncated)"
+        "frontend/src/components/team/PatientDetailsCard.tsx (truncated)",
+        "frontend/src/utils/patientSubmissionDetails.ts (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "Render responsesSectionA and responsesSectionB in Patient Details with readable formatting including scoreType (or N/A), answer.text, answer.score, and feedbackText; show an English empty state when a section has zero responses.",
+      "reason": "QuestionnaireResponsesSection.tsx satisfies the per-response rendering and the empty state, but the diff summary does not show PatientDetailsCard actually rendering two distinct sections for Section A and Section B (e.g., passing submission.responsesSectionA and submission.responsesSectionB). PatientDetailsCard is truncated before any such usage is visible.",
+      "evidence": [
+        "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+        "frontend/src/components/team/PatientDetailsCard.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added an 'update' mutation hook that reuses submitPatientForm to \"update\" submissions (with comments stating there is no backend update method).",
-      "reason": "BuildRequest did not ask to add an update flow/hook; it only requested fixing submission reliability, using backend-returned ids, and a minimal dashboard regression check.",
+      "description": "Added a 'Send Results' WhatsApp action button inside the Patient Details card header.",
+      "reason": "REQ-1/REQ-2 focus on displaying submission fields and questionnaire responses; they do not request adding or changing action buttons within the Patient Details card. The diff explicitly adds a button labeled 'Send Results' conditioned on WhatsApp number availability.",
       "evidence": [
-        "frontend/src/hooks/useSubmissions.ts"
+        "frontend/src/components/team/PatientDetailsCard.tsx (truncated)"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.56,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/dashboard/SubmissionsTable.tsx",
-    "frontend/src/hooks/useSubmissions.ts",
-    "frontend/src/pages/DashboardPage.tsx",
-    "frontend/src/pages/PatientFormPage.tsx",
+    "frontend/src/components/team/PatientDetailsCard.tsx",
+    "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
+    "frontend/src/pages/TeamManagementPage.tsx",
+    "frontend/src/utils/patientSubmissionDetails.ts",
     "project_state.json"
   ]
 }

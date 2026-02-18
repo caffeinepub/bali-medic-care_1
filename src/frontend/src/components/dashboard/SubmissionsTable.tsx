@@ -15,6 +15,24 @@ export default function SubmissionsTable({ submissions, isLoading, onSelectSubmi
     return match ? match[1].trim() : null;
   };
 
+  const getPatientName = (submission: PatientSubmission): string => {
+    // Prefer structured personalInfo field
+    if (submission.personalInfo.fullName) {
+      return submission.personalInfo.fullName;
+    }
+    // Fallback to context parsing for older submissions
+    return extractField(submission.detailedInfo.context || '', 'Name') || 'Unknown';
+  };
+
+  const getPatientRoom = (submission: PatientSubmission): string => {
+    // Prefer structured personalInfo field
+    if (submission.personalInfo.roomNumber) {
+      return submission.personalInfo.roomNumber;
+    }
+    // Fallback to context parsing for older submissions
+    return extractField(submission.detailedInfo.context || '', 'Room') || 'N/A';
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -39,9 +57,8 @@ export default function SubmissionsTable({ submissions, isLoading, onSelectSubmi
           console.warn('⚠️ SubmissionsTable: Rendering submission with id=0');
         }
 
-        const context = submission.detailedInfo.context || '';
-        const name = extractField(context, 'Name') || 'Unknown';
-        const room = extractField(context, 'Room') || 'N/A';
+        const name = getPatientName(submission);
+        const room = getPatientRoom(submission);
         const date = submission.detailedInfo.date || 'N/A';
         const isCompleted = submission.submissionStatus === SubmissionStatus.completed;
 

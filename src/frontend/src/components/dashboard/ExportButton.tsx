@@ -14,6 +14,15 @@ export default function ExportButton({ submissions, filterDate }: ExportButtonPr
     return match ? match[1].trim() : null;
   };
 
+  const getFieldValue = (submission: PatientSubmission, structuredField: keyof typeof submission.personalInfo, contextField: string): string => {
+    // Prefer structured personalInfo field
+    if (submission.personalInfo[structuredField]) {
+      return submission.personalInfo[structuredField] as string;
+    }
+    // Fallback to context parsing for older submissions
+    return extractField(submission.detailedInfo.context || '', contextField) || '-';
+  };
+
   const handleExport = () => {
     if (submissions.length === 0) return;
 
@@ -40,13 +49,16 @@ export default function ExportButton({ submissions, filterDate }: ExportButtonPr
 
     const rows = submissions.map((submission) => {
       const context = submission.detailedInfo.context || '';
+      const symptoms = getFieldValue(submission, 'symptoms', 'Symptoms') || 
+                       getFieldValue(submission, 'medicalConditions', 'Symptoms');
+      
       return [
         submission.id.toString(),
-        extractField(context, 'Name') || '-',
-        extractField(context, 'Room') || '-',
-        extractField(context, 'Nationality') || '-',
-        extractField(context, 'WhatsApp') || '-',
-        `"${(extractField(context, 'Symptoms') || '-').replace(/"/g, '""')}"`,
+        getFieldValue(submission, 'fullName', 'Name'),
+        getFieldValue(submission, 'roomNumber', 'Room'),
+        getFieldValue(submission, 'country', 'Nationality'),
+        getFieldValue(submission, 'whatsappNumber', 'WhatsApp'),
+        `"${symptoms.replace(/"/g, '""')}"`,
         extractField(context, 'Blood Pressure') || '-',
         extractField(context, 'Pulse') || '-',
         extractField(context, 'Oxygen') || '-',

@@ -1,117 +1,24 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
-  "summary": "Build a Google Form-style medical registration and medical-team dashboard web app (Bali Medic Care) using the provided React + Firebase code, preserving the existing structure and screens; patient registration is publicly accessible with no login, while the entire medical team must log in (Internet Identity) to access the dashboard and team edit features.",
-  "architectural_notes": [
-    "Keep existing React + Firebase architecture and current view flow (patient-form, dashboard, team-edit, exam-success); changes should be styling/UI only to match Google Forms look and feel.",
-    "Access control decision: patient form requires no login; Internet Identity login is required for all medical team members to access dashboard and team management screens."
-  ],
-  "known_issues": [
-    "Patient registration form submission fails on Submit (\"Failed to submit form. Please try again.\"), resulting in no data saved to backend/dashboard; occurs on all devices."
-  ],
-  "isFixRequest": true,
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-rebuild-the-application-using-the-internet-computer-stack-motoko-backend-react-typescript-frontend-while-preserving-the-same-user-flows-pages-and-behavior-as-in-the-user-provided-react-firebase-script",
-      "title": "Rebuild the application using the Internet Computer stack (Motoko backend + React/TypeScript frontend) while preserving the same user flows, pages, and behavior as in the user-provided React + Firebase script.",
+      "id": "feature-update-the-team-management-page-patient-details-card-to-display-all-available-fields-from-the-selected-patientsubmission-not-just-name-room-nationality-whatsapp-symptoms-using-structured-fields-when-present-and-falling-back-to-parsing-detailedinfo-context-only-when-structured-fields-are-missing",
+      "title": "Update the Team Management page \"Patient Details\" card to display all available fields from the selected PatientSubmission (not just name/room/nationality/WhatsApp/symptoms), using structured fields when present and falling back to parsing detailedInfo.context only when structured fields are missing.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-a-google-forms-style-ui-redesign-across-the-patient-registration-form-and-related-screens-layout-spacing-typography-input-styling-section-headers-progress-submit-affordances-without-removing-or-changing-existing-form-fields-logic-from-the-user-provided-script",
-      "title": "Implement a Google Forms-style UI redesign across the patient registration form and related screens (layout, spacing, typography, input styling, section headers, progress/submit affordances) without removing or changing existing form fields/logic from the user-provided script.",
+      "id": "feature-render-questionnaire-response-data-responsessectiona-and-responsessectionb-in-the-patient-details-view-in-a-readable-format-e-g-tables-or-definition-lists-including-each-response-s-scoretype-selected-answer-text-score-and-feedbacktext-when-present",
+      "title": "Render questionnaire response data (responsesSectionA and responsesSectionB) in the Patient Details view in a readable format (e.g., tables or definition lists), including each response's scoreType, selected answer text, score, and feedbackText when present.",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-internet-identity-authentication-for-the-medical-team-dashboard-and-any-admin-team-edit-functionality-while-keeping-the-patient-registration-form-accessible-per-the-behavior-of-the-user-provided-script",
-      "title": "Implement Internet Identity authentication for the medical-team dashboard and any admin/team edit functionality, while keeping the patient registration form accessible per the behavior of the user-provided script.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-recreate-the-medical-team-dashboard-screens-and-features-from-the-user-provided-script-including-listing-submissions-viewing-details-searching-and-filtering-by-date-and-any-other-existing-filters-present-in-the-script",
-      "title": "Recreate the medical-team dashboard screens and features from the user-provided script, including listing submissions, viewing details, searching, and filtering by date (and any other existing filters present in the script).",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-recreate-the-export-functionality-from-the-user-provided-script-so-authenticated-dashboard-users-can-export-filtered-results-e-g-csv-from-the-current-dashboard-view",
-      "title": "Recreate the export functionality from the user-provided script so authenticated dashboard users can export filtered results (e.g., CSV) from the current dashboard view.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-recreate-the-medical-team-edit-management-screen-s-from-the-user-provided-script-e-g-editing-team-members-or-clinic-team-metadata-persisting-changes-to-the-motoko-backend-and-restricting-access-to-authenticated-users",
-      "title": "Recreate the medical-team edit/management screen(s) from the user-provided script (e.g., editing team members or clinic/team metadata), persisting changes to the Motoko backend and restricting access to authenticated users.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-patient-submission-success-confirmation-screen-s-from-the-user-provided-script-and-ensure-navigation-after-submission-matches-the-script-e-g-reset-form-show-success-redirect-behavior",
-      "title": "Implement the patient submission success/confirmation screen(s) from the user-provided script and ensure navigation after submission matches the script (e.g., reset form, show success, redirect behavior).",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-coherent-visual-theme-that-supports-a-google-forms-like-aesthetic-neutral-whites-grays-clear-typographic-hierarchy-subtle-shadows-consistent-spacing-and-use-it-consistently-across-all-screens",
-      "title": "Apply a coherent visual theme that supports a Google Forms-like aesthetic (neutral whites/grays, clear typographic hierarchy, subtle shadows, consistent spacing) and use it consistently across all screens.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-generated-static-brand-assets-for-the-app-logo-simple-header-banner-and-render-them-in-the-ui-as-static-files-served-from-the-frontend-not-via-the-backend",
-      "title": "Add generated static brand assets for the app (logo + simple header banner) and render them in the UI as static files served from the frontend (not via the backend).",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-patient-registration-experience-is-fully-public-no-login-required-and-does-not-present-any-patient-facing-ui-that-implies-patients-must-authenticate",
-      "title": "Ensure the patient registration experience is fully public (no login required) and does not present any patient-facing UI that implies patients must authenticate.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-all-medical-team-areas-require-internet-identity-login-and-clearly-communicate-that-authentication-is-for-medical-team-members-only",
-      "title": "Ensure all medical team areas require Internet Identity login and clearly communicate that authentication is for medical team members only.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-patient-form-submission-flow-to-use-the-backend-returned-submission-id-and-show-an-actionable-error-message-when-submission-fails-including-surfacing-the-backend-error-trap-reason-in-console-logs-while-keeping-the-current-toast-text-in-english",
-      "title": "Update the patient form submission flow to use the backend-returned submission id and show an actionable error message when submission fails (including surfacing the backend error/trap reason in console logs) while keeping the current toast text in English.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-minimal-regression-check-in-the-medical-team-dashboard-data-flow-so-that-newly-submitted-patient-records-can-be-retrieved-and-displayed-after-a-successful-submission-no-code-path-relies-on-client-sent-id-0",
-      "title": "Add a minimal regression check in the medical team dashboard data flow so that newly submitted patient records can be retrieved and displayed after a successful submission (no code path relies on client-sent id=0).",
-      "reqIds": [
-        "REQ-15"
       ],
       "version": 1
     }
@@ -119,28 +26,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Update UI to resemble Google Forms while preserving all existing functionality and structure from the provided React + Firebase script",
+      "summary": "Tampilkan semua data pada halaman/section \"Patient Details\"",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Create Motoko data models and stable persistence for all records currently stored in Firebase in the user-provided script, including the ability to create new patient submissions and read/query them for the dashboard.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Fix the backend patient submission endpoint so public patient form submissions do not fail when no default clinic config exists, and ensure each saved submission receives a unique server-assigned id.",
-      "reqIds": [
-        "REQ-13"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "Bali Medic Care",
+  "projectName": "Clinic Exam Sender",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
