@@ -1,0 +1,59 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Bali Medic Care — Patient public access, medical team Internet Identity protection",
+  "requirements": [
+    {
+      "id": "REQ-11",
+      "summary": "Keep patient registration and success pages fully public and remove patient-facing login implications.",
+      "acceptanceCriteria": [
+        "Visiting '/' and '/success' never triggers an auth prompt, redirect, or \"Access Denied\" screen.",
+        "The patient-facing header/navigation does not show generic \"Login\" wording aimed at patients (e.g., hide the login button on patient pages, or relabel it so it clearly applies only to medical team members).",
+        "All patient form submission flows continue to work when not authenticated (anonymous actor)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/layout/AppHeader.tsx",
+          "operation": "modify",
+          "description": "Update patient-facing header behavior so '/' and '/success' never present generic patient-directed authentication UI; e.g., hide the auth control on patient pages or relabel it explicitly as \"Medical Team Login\" and ensure navigation wording is patient-safe. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/LoginButton.tsx",
+          "operation": "modify",
+          "description": "Extend the login button to support medical-team-specific labeling when rendered from patient-facing pages (avoid generic \"Login\" wording) while preserving existing Internet Identity login/logout behavior. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/PatientFormPage.tsx",
+          "operation": "modify",
+          "description": "Double-check that patient submission remains functional for anonymous users and does not depend on authenticated-only data fetching; adjust UI copy only if needed to avoid implying login is required."
+        }
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "summary": "Require Internet Identity login for all medical team routes and show medical-team-specific access messaging.",
+      "acceptanceCriteria": [
+        "Routes '/dashboard', '/team', and '/exam-success' remain protected behind Internet Identity authentication.",
+        "When an unauthenticated user navigates to any protected route, the access screen messaging and call-to-action are medical-team-specific (e.g., \"Medical team members must log in to access this area\").",
+        "After a successful login, the protected route content renders without requiring any patient login step."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Confirm protected medical team routes remain wrapped with ProtectedRoute and ensure no patient routes are accidentally wrapped (keep '/' and '/success' public)."
+        },
+        {
+          "path": "frontend/src/components/auth/ProtectedRoute.tsx",
+          "operation": "modify",
+          "description": "Update unauthenticated gating UI to be explicitly medical-team-only (title/body/button text) and ensure the call-to-action triggers Internet Identity login. Use the authorization component’s frontend guidance for authentication UX and for handling authorization failures gracefully; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/AppHeader.tsx",
+          "operation": "modify",
+          "description": "Ensure header copy/controls on medical team pages clearly indicate authentication is for medical team members (and avoid any patient-directed login implication). Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

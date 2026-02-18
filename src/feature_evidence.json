@@ -1,0 +1,45 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-ensure-the-patient-registration-experience-is-fully-public-no-login-required-and-does-not-present-any-patient-facing-ui-that-implies-patients-must-authenticate",
+      "featureTitle": "Ensure the patient registration experience is fully public (no login required) and does not present any patient-facing UI that implies patients must authenticate.",
+      "files": [
+        "frontend/src/components/auth/LoginButton.tsx",
+        "frontend/src/components/layout/AppHeader.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-all-medical-team-areas-require-internet-identity-login-and-clearly-communicate-that-authentication-is-for-medical-team-members-only",
+      "featureTitle": "Ensure all medical team areas require Internet Identity login and clearly communicate that authentication is for medical team members only.",
+      "files": [
+        "frontend/src/components/auth/ProtectedRoute.tsx",
+        "frontend/src/components/layout/AppHeader.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

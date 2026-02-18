@@ -1,0 +1,58 @@
+{
+  "kind": "build_request",
+  "title": "Apply access rules: patients no login, medical team login only",
+  "projectName": "Bali Medic Care",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-11",
+      "text": "Ensure the patient registration experience is fully public (no login required) and does not present any patient-facing UI that implies patients must authenticate.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "tidak ada login apa pun untuk pasien"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Visiting '/' and '/success' never triggers an auth prompt, redirect, or \"Access Denied\" screen.",
+        "The patient-facing header/navigation does not show generic \"Login\" wording aimed at patients (e.g., hide the login button on patient pages, or relabel it so it clearly applies only to medical team members).",
+        "All patient form submission flows continue to work when not authenticated (anonymous actor)."
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Ensure all medical team areas require Internet Identity login and clearly communicate that authentication is for medical team members only.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "seluruh tim medis yang boleh login"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Routes '/dashboard', '/team', and '/exam-success' remain protected behind Internet Identity authentication.",
+        "When an unauthenticated user navigates to any protected route, the access screen messaging and call-to-action are medical-team-specific (e.g., \"Medical team members must log in to access this area\").",
+        "After a successful login, the protected route content renders without requiring any patient login step."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not add any authentication requirement to patient-facing routes ('/' and '/success').",
+    "Do not modify files under frontend/src/components/ui or any other immutable paths listed in SYSTEM_CONTEXT.",
+    "Keep the backend as a single Motoko actor; do not introduce additional canisters/services."
+  ],
+  "nonGoals": [
+    "Implementing role-based permissions within the medical team (all logged-in medical team members are treated the same).",
+    "Adding third-party authentication providers beyond Internet Identity.",
+    "Changing form fields or submission payload structure beyond what is needed to enforce the access rules and messaging."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
