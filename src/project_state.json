@@ -1,13 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
+  "projectStateVersion": 7,
   "summary": "Build a Google Form-style medical registration and medical-team dashboard web app (Bali Medic Care) using the provided React + Firebase code, preserving the existing structure and screens; patient registration is publicly accessible with no login, while the entire medical team must log in (Internet Identity) to access the dashboard and team edit features.",
   "architectural_notes": [
     "Keep existing React + Firebase architecture and current view flow (patient-form, dashboard, team-edit, exam-success); changes should be styling/UI only to match Google Forms look and feel.",
     "Access control decision: patient form requires no login; Internet Identity login is required for all medical team members to access dashboard and team management screens."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Patient registration form submission fails on Submit (\"Failed to submit form. Please try again.\"), resulting in no data saved to backend/dashboard; occurs on all devices."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-rebuild-the-application-using-the-internet-computer-stack-motoko-backend-react-typescript-frontend-while-preserving-the-same-user-flows-pages-and-behavior-as-in-the-user-provided-react-firebase-script",
@@ -96,6 +98,22 @@
         "REQ-12"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-patient-form-submission-flow-to-use-the-backend-returned-submission-id-and-show-an-actionable-error-message-when-submission-fails-including-surfacing-the-backend-error-trap-reason-in-console-logs-while-keeping-the-current-toast-text-in-english",
+      "title": "Update the patient form submission flow to use the backend-returned submission id and show an actionable error message when submission fails (including surfacing the backend error/trap reason in console logs) while keeping the current toast text in English.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-minimal-regression-check-in-the-medical-team-dashboard-data-flow-so-that-newly-submitted-patient-records-can-be-retrieved-and-displayed-after-a-successful-submission-no-code-path-relies-on-client-sent-id-0",
+      "title": "Add a minimal regression check in the medical team dashboard data flow so that newly submitted patient records can be retrieved and displayed after a successful submission (no code path relies on client-sent id=0).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -110,6 +128,14 @@
       "summary": "Create Motoko data models and stable persistence for all records currently stored in Firebase in the user-provided script, including the ability to create new patient submissions and read/query them for the dashboard.",
       "reqIds": [
         "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Fix the backend patient submission endpoint so public patient form submissions do not fail when no default clinic config exists, and ensure each saved submission receives a unique server-assigned id.",
+      "reqIds": [
+        "REQ-13"
       ],
       "status": "pending"
     }

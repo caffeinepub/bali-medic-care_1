@@ -13,6 +13,14 @@ export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
+  // Runtime regression check for id=0 submissions
+  if (submissions.length > 0) {
+    const zeroIdSubmissions = submissions.filter(s => s.id === BigInt(0));
+    if (zeroIdSubmissions.length > 0) {
+      console.warn('⚠️ Dashboard: Found submissions with id=0:', zeroIdSubmissions.length);
+    }
+  }
+
   const filteredSubmissions = submissions.filter((submission) => {
     const context = submission.detailedInfo.context || '';
     const matchesSearch =
@@ -26,6 +34,7 @@ export default function DashboardPage() {
   });
 
   const handleSelectSubmission = (submission: PatientSubmission) => {
+    console.log('📋 Navigating to team page with submission ID:', submission.id.toString());
     navigate({
       to: '/team',
       search: { submissionId: submission.id.toString() },

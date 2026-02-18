@@ -241,14 +241,14 @@ actor {
   public shared ({ caller }) func submitPatientForm(submission : PatientSubmission) : async Nat {
     // Public access - patient registration form is accessible to everyone (guests)
     // No authorization check needed per implementation plan
-    let sections = switch (clinicConfigs.get(DEFAULT_CLINIC_ID)) {
-      case (null) {
-        Runtime.trap("Default clinic config not found");
-      };
-      case (?config) { config.sections };
-    };
+
+    // Remove default config check
     lastSubmissionId += 1;
-    patientSubmissions.add(lastSubmissionId, submission);
+    let submissionWithServerAssignedId = {
+      submission with id = lastSubmissionId;
+    };
+
+    patientSubmissions.add(lastSubmissionId, submissionWithServerAssignedId);
     lastSubmissionId;
   };
 
@@ -270,29 +270,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can view patient submissions");
     };
-    let currentTime = 0;
     switch (filterType) {
-      case ("all") {
-        patientSubmissions.values().toArray();
-      };
-      case ("last12Months") {
-        patientSubmissions.values().toArray();
-      };
-      case ("currentYear") {
-        patientSubmissions.values().toArray();
-      };
-      case ("lastMonth") {
-        patientSubmissions.values().toArray();
-      };
-      case ("currentMonth") {
-        patientSubmissions.values().toArray();
-      };
-      case ("currentWeek") {
-        patientSubmissions.values().toArray();
-      };
-      case ("today") {
-        patientSubmissions.values().toArray();
-      };
       case (_) {
         patientSubmissions.values().toArray();
       };

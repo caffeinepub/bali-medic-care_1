@@ -1,54 +1,62 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T06:59:51.476Z",
+  "generatedAt": "2026-02-18T07:20:05.495Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
+    "total": 3,
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "Ensure the patient registration experience is fully public (no login required) and does not present any patient-facing UI that implies patients must authenticate.",
+        "id": "REQ-13",
+        "summary": "Fix the backend patient submission endpoint so public patient form submissions do not fail when no default clinic config exists, and ensure each saved submission receives a unique server-assigned id.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-14",
+        "summary": "Update the patient form submission flow to use the backend-returned submission id and show an actionable error message when submission fails (including surfacing the backend error/trap reason in console logs) while keeping the current toast text in English.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/layout/AppHeader.tsx",
-          "frontend/src/components/auth/LoginButton.tsx",
-          "frontend/src/pages/PatientFormPage.tsx"
+          "frontend/src/pages/PatientFormPage.tsx",
+          "frontend/src/hooks/useSubmissions.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/layout/AppHeader.tsx",
-          "frontend/src/components/auth/LoginButton.tsx"
+          "frontend/src/pages/PatientFormPage.tsx",
+          "frontend/src/hooks/useSubmissions.ts"
         ]
       },
       {
-        "id": "REQ-12",
-        "summary": "Ensure all medical team areas require Internet Identity login and clearly communicate that authentication is for medical team members only.",
+        "id": "REQ-15",
+        "summary": "Add a minimal regression check in the medical team dashboard data flow so that newly submitted patient records can be retrieved and displayed after a successful submission (no code path relies on client-sent id=0).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/components/auth/ProtectedRoute.tsx",
-          "frontend/src/components/layout/AppHeader.tsx"
+          "frontend/src/hooks/useSubmissions.ts",
+          "frontend/src/pages/DashboardPage.tsx",
+          "frontend/src/components/dashboard/SubmissionsTable.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/auth/ProtectedRoute.tsx",
-          "frontend/src/components/layout/AppHeader.tsx"
+          "frontend/src/hooks/useSubmissions.ts",
+          "frontend/src/pages/DashboardPage.tsx",
+          "frontend/src/components/dashboard/SubmissionsTable.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/auth/LoginButton.tsx",
-    "frontend/src/components/auth/ProtectedRoute.tsx",
-    "frontend/src/components/layout/AppHeader.tsx",
+    "frontend/src/components/dashboard/SubmissionsTable.tsx",
+    "frontend/src/hooks/useSubmissions.ts",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/PatientFormPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

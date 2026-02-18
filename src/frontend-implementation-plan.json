@@ -1,57 +1,52 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Bali Medic Care — Patient public access, medical team Internet Identity protection",
+  "title": "Fix patient form submission flow to use backend id and improve dashboard retrieval robustness",
   "requirements": [
     {
-      "id": "REQ-11",
-      "summary": "Keep patient registration and success pages fully public and remove patient-facing login implications.",
+      "id": "REQ-14",
+      "summary": "Use backend-returned submission id in the patient form flow and improve failure diagnostics while keeping the existing English toast text.",
       "acceptanceCriteria": [
-        "Visiting '/' and '/success' never triggers an auth prompt, redirect, or \"Access Denied\" screen.",
-        "The patient-facing header/navigation does not show generic \"Login\" wording aimed at patients (e.g., hide the login button on patient pages, or relabel it so it clearly applies only to medical team members).",
-        "All patient form submission flows continue to work when not authenticated (anonymous actor)."
+        "On successful submit, the app navigates to /success as it does today.",
+        "On failure, the user still sees the toast: \"Failed to submit form. Please try again.\"",
+        "On failure, the browser console logs include the underlying error details sufficient to debug (not only a generic message).",
+        "The mutation uses the backend response (Nat id) appropriately (e.g., storing/handling the returned id rather than assuming id=0)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/layout/AppHeader.tsx",
-          "operation": "modify",
-          "description": "Update patient-facing header behavior so '/' and '/success' never present generic patient-directed authentication UI; e.g., hide the auth control on patient pages or relabel it explicitly as \"Medical Team Login\" and ensure navigation wording is patient-safe. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/LoginButton.tsx",
-          "operation": "modify",
-          "description": "Extend the login button to support medical-team-specific labeling when rendered from patient-facing pages (avoid generic \"Login\" wording) while preserving existing Internet Identity login/logout behavior. Verify the component's usage instructions before implementing."
-        },
-        {
           "path": "frontend/src/pages/PatientFormPage.tsx",
           "operation": "modify",
-          "description": "Double-check that patient submission remains functional for anonymous users and does not depend on authenticated-only data fetching; adjust UI copy only if needed to avoid implying login is required."
+          "description": "Capture the bigint submission id returned by the backend call, validate it is non-zero, and log it for traceability before navigating to /success; on errors, keep the existing English toast text while expanding console logging to include raw error objects and any nested/cause details (to surface backend trap reasons)."
+        },
+        {
+          "path": "frontend/src/hooks/useSubmissions.ts",
+          "operation": "modify",
+          "description": "Type and document the submit mutation return value as the backend-returned bigint id, ensuring callers can rely on the response; keep query invalidation on success and avoid any client-side assumptions that the id is 0."
         }
       ]
     },
     {
-      "id": "REQ-12",
-      "summary": "Require Internet Identity login for all medical team routes and show medical-team-specific access messaging.",
+      "id": "REQ-15",
+      "summary": "Add a minimal regression check to ensure the dashboard retrieves and displays newly submitted records and navigation uses the backend id (not a client-sent placeholder).",
       "acceptanceCriteria": [
-        "Routes '/dashboard', '/team', and '/exam-success' remain protected behind Internet Identity authentication.",
-        "When an unauthenticated user navigates to any protected route, the access screen messaging and call-to-action are medical-team-specific (e.g., \"Medical team members must log in to access this area\").",
-        "After a successful login, the protected route content renders without requiring any patient login step."
+        "After a successful patient submission, an authenticated medical team user can open /dashboard and see the new submission listed.",
+        "Selecting the new submission from the table navigates to /team with the correct submissionId parameter (non-zero, matching the saved submission)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/hooks/useSubmissions.ts",
           "operation": "modify",
-          "description": "Confirm protected medical team routes remain wrapped with ProtectedRoute and ensure no patient routes are accidentally wrapped (keep '/' and '/success' public)."
+          "description": "Adjust the dashboard submissions query behavior to reliably refetch when the dashboard is opened (e.g., ensure refetch-on-mount/short staleness) so newly created submissions are retrieved without requiring any client-generated id assumptions."
         },
         {
-          "path": "frontend/src/components/auth/ProtectedRoute.tsx",
+          "path": "frontend/src/pages/DashboardPage.tsx",
           "operation": "modify",
-          "description": "Update unauthenticated gating UI to be explicitly medical-team-only (title/body/button text) and ensure the call-to-action triggers Internet Identity login. Use the authorization component’s frontend guidance for authentication UX and for handling authorization failures gracefully; verify the component's usage instructions before implementing."
+          "description": "Add a minimal runtime regression check in the dashboard data flow: warn in the console if any retrieved submission has id=0, and ensure selection/navigation continues to use the backend-provided submission.id when navigating to /team."
         },
         {
-          "path": "frontend/src/components/layout/AppHeader.tsx",
+          "path": "frontend/src/components/dashboard/SubmissionsTable.tsx",
           "operation": "modify",
-          "description": "Ensure header copy/controls on medical team pages clearly indicate authentication is for medical team members (and avoid any patient-directed login implication). Verify the component's usage instructions before implementing."
+          "description": "Harden rendering expectations around ids by ensuring list keys and click-selection operate on submission.id.toString() and optionally emitting a console warning if a submission with id=0 is encountered (without changing user-facing text)."
         }
       ]
     }

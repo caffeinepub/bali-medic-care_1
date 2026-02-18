@@ -34,6 +34,11 @@ export default function SubmissionsTable({ submissions, isLoading, onSelectSubmi
   return (
     <div className="space-y-3">
       {submissions.map((submission) => {
+        // Warn if submission has id=0
+        if (submission.id === BigInt(0)) {
+          console.warn('⚠️ SubmissionsTable: Rendering submission with id=0');
+        }
+
         const context = submission.detailedInfo.context || '';
         const name = extractField(context, 'Name') || 'Unknown';
         const room = extractField(context, 'Room') || 'N/A';

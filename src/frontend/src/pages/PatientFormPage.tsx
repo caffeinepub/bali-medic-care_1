@@ -27,7 +27,9 @@ export default function PatientFormPage() {
     e.preventDefault();
 
     try {
-      await submitForm.mutateAsync({
+      console.log('📤 Submitting patient form...');
+      
+      const submissionId = await submitForm.mutateAsync({
         id: BigInt(0),
         clinicId: 'apsp',
         patientId: undefined,
@@ -70,9 +72,29 @@ export default function PatientFormPage() {
         additionalInfo: undefined,
       });
 
+      // Validate the returned ID
+      if (submissionId === BigInt(0)) {
+        console.warn('⚠️ Backend returned submission ID of 0, which may indicate an issue');
+      } else {
+        console.log('✅ Form submitted successfully with ID:', submissionId.toString());
+      }
+
       navigate({ to: '/success' });
-    } catch (error) {
-      console.error('Submission error:', error);
+    } catch (error: any) {
+      console.error('❌ Submission error:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        name: error?.name,
+        stack: error?.stack,
+        cause: error?.cause,
+        raw: error,
+      });
+      
+      // Log additional context if available
+      if (error?.message) {
+        console.error('Error message:', error.message);
+      }
+      
       toast.error('Failed to submit form. Please try again.');
     }
   };

@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-ensure-the-patient-registration-experience-is-fully-public-no-login-required-and-does-not-present-any-patient-facing-ui-that-implies-patients-must-authenticate",
-      "featureTitle": "Ensure the patient registration experience is fully public (no login required) and does not present any patient-facing UI that implies patients must authenticate.",
+      "featureId": "feature-update-the-patient-form-submission-flow-to-use-the-backend-returned-submission-id-and-show-an-actionable-error-message-when-submission-fails-including-surfacing-the-backend-error-trap-reason-in-console-logs-while-keeping-the-current-toast-text-in-english",
+      "featureTitle": "Update the patient form submission flow to use the backend-returned submission id and show an actionable error message when submission fails (including surfacing the backend error/trap reason in console logs) while keeping the current toast text in English.",
       "files": [
-        "frontend/src/components/auth/LoginButton.tsx",
-        "frontend/src/components/layout/AppHeader.tsx"
+        "frontend/src/hooks/useSubmissions.ts",
+        "frontend/src/pages/PatientFormPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,16 +17,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
+        "REQ-14"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-all-medical-team-areas-require-internet-identity-login-and-clearly-communicate-that-authentication-is-for-medical-team-members-only",
-      "featureTitle": "Ensure all medical team areas require Internet Identity login and clearly communicate that authentication is for medical team members only.",
+      "featureId": "feature-add-a-minimal-regression-check-in-the-medical-team-dashboard-data-flow-so-that-newly-submitted-patient-records-can-be-retrieved-and-displayed-after-a-successful-submission-no-code-path-relies-on-client-sent-id-0",
+      "featureTitle": "Add a minimal regression check in the medical team dashboard data flow so that newly submitted patient records can be retrieved and displayed after a successful submission (no code path relies on client-sent id=0).",
       "files": [
-        "frontend/src/components/auth/ProtectedRoute.tsx",
-        "frontend/src/components/layout/AppHeader.tsx"
+        "frontend/src/components/dashboard/SubmissionsTable.tsx",
+        "frontend/src/hooks/useSubmissions.ts",
+        "frontend/src/pages/DashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -37,7 +38,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-12"
+        "REQ-15"
       ],
       "confidence": "high"
     }
