@@ -1,5 +1,4 @@
 import { useNavigate, useRouterState } from '@tanstack/react-router';
-import { Stethoscope } from 'lucide-react';
 import LoginButton from '../auth/LoginButton';
 import { useInternetIdentity } from '@/hooks/useInternetIdentity';
 
@@ -22,7 +21,7 @@ export default function AppHeader() {
             className="flex items-center gap-2 font-bold text-primary hover:opacity-80 transition-opacity"
           >
             <img 
-              src="/assets/generated/bali-medic-care-logo.dim_512x512.png" 
+              src="/assets/generated/bali-medic-care-logo-v2.dim_512x512.png" 
               alt="Bali Medic Care" 
               className="h-8 w-8 object-contain"
             />

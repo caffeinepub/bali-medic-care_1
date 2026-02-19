@@ -3,10 +3,8 @@ import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
-
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-
 
 actor {
   type AnswerOption = {
@@ -245,9 +243,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
-    let filtered = clinicConfigs.filter(
-      func(id, _) { id == DEFAULT_CLINIC_ID }
-    );
+    let filtered = clinicConfigs.filter(func(id, _) { id == DEFAULT_CLINIC_ID });
     filtered.entries().toArray();
   };
 
@@ -289,8 +285,7 @@ actor {
     switch (patientSubmissions.get(submissionId)) {
       case (?existingSubmission) {
         let updatedSubmission = {
-          existingSubmission with
-          personalInfo
+          existingSubmission with personalInfo
         };
         patientSubmissions.add(submissionId, updatedSubmission);
       };

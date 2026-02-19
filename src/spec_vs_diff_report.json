@@ -1,44 +1,38 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T09:10:59.509Z",
-  "summary": "The diff adds a new PatientDetailsCard component plus utilities to build a view-model with structured-field preference and context-string fallback, and adds a QuestionnaireResponsesSection component with an English empty state. However, due to truncation, several required fields/sections are not verifiably rendered in the Patient Details UI from the provided diff summary.",
-  "missing_requirements": [
+  "generatedAt": "2026-02-19T07:10:29.886Z",
+  "summary": "The diff demonstrates comprehensive implementation of both requirements. REQ-1 is addressed through client-side validation, actor readiness checks, structured data formatting, and proper error handling with user feedback. REQ-2 is extensively implemented with detailed console logging throughout the submission flow, error categorization, and inline validation messages. All acceptance criteria appear to be met based on the code changes.",
+  "missing_requirements": [],
+  "hallucinated_features": [
     {
-      "id": "REQ-1",
-      "requirement": "Patient Details card displays all minimum required PatientSubmission fields (demographic, timestamps, detailedInfo, initialScore, summary, feedbackCode, notes, additionalInfo) when a submission is selected on /team.",
-      "reason": "The new PatientDetailsCard.tsx excerpt only shows Basic Information (Submission ID, Clinic ID, Patient ID, Status) and part of Personal Information. The view-model utility computes demographic/timestamps/detailedInfo/initialScore/summaryScore, but the return object and the card rendering for the rest of the required fields are truncated, so their presence in the UI cannot be confirmed from the diff summary.",
+      "description": "Added extensive error categorization system with labels like 'ACTOR_INITIALIZATION', 'ACTOR_LOADING', 'NETWORK_ERROR'",
+      "reason": "While REQ-2 requested error logging and validation feedback, the specific categorization system (with category labels) goes beyond what was explicitly requested",
       "evidence": [
-        "frontend/src/components/team/PatientDetailsCard.tsx (truncated)",
-        "frontend/src/utils/patientSubmissionDetails.ts (truncated)"
+        "frontend/src/hooks/useSubmissions.ts"
       ]
     },
     {
-      "id": "REQ-2",
-      "requirement": "Render responsesSectionA and responsesSectionB in Patient Details with readable formatting including scoreType (or N/A), answer.text, answer.score, and feedbackText; show an English empty state when a section has zero responses.",
-      "reason": "QuestionnaireResponsesSection.tsx satisfies the per-response rendering and the empty state, but the diff summary does not show PatientDetailsCard actually rendering two distinct sections for Section A and Section B (e.g., passing submission.responsesSectionA and submission.responsesSectionB). PatientDetailsCard is truncated before any such usage is visible.",
+      "description": "Added toast notifications using 'sonner' library for user feedback",
+      "reason": "Toast notifications were not mentioned in the requirements or acceptance criteria, though they serve the general goal of user feedback",
       "evidence": [
-        "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
-        "frontend/src/components/team/PatientDetailsCard.tsx (truncated)"
+        "frontend/src/pages/PatientFormPage.tsx"
       ]
-    }
-  ],
-  "hallucinated_features": [
+    },
     {
-      "description": "Added a 'Send Results' WhatsApp action button inside the Patient Details card header.",
-      "reason": "REQ-1/REQ-2 focus on displaying submission fields and questionnaire responses; they do not request adding or changing action buttons within the Patient Details card. The diff explicitly adds a button labeled 'Send Results' conditioned on WhatsApp number availability.",
+      "description": "Added runtime regression checks for id=0 submissions in DashboardPage",
+      "reason": "This debugging feature was not requested in either requirement",
       "evidence": [
-        "frontend/src/components/team/PatientDetailsCard.tsx (truncated)"
+        "frontend-file-summaries.txt"
       ]
     }
   ],
-  "confidence": 0.56,
+  "confidence": 0.85,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/team/PatientDetailsCard.tsx",
-    "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
-    "frontend/src/pages/TeamManagementPage.tsx",
-    "frontend/src/utils/patientSubmissionDetails.ts",
+    "frontend/src/hooks/useSubmissions.ts",
+    "frontend/src/pages/PatientFormPage.tsx",
     "project_state.json"
   ]
 }

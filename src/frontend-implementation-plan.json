@@ -1,57 +1,48 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Clinic Exam Sender — Expand Patient Details to show full PatientSubmission fields and questionnaire responses",
+  "title": "Fix Patient Form Submission Error",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Expand the /team Patient Details card to display all available PatientSubmission fields with structured-first rendering and safe fallback parsing from detailedInfo.context when structured fields are missing.",
+      "summary": "Investigate and fix the form submission failure in PatientFormPage that causes the 'Failed to submit form. Please try again.' error message",
       "acceptanceCriteria": [
-        "When a submission is selected on /team, the Patient Details section shows, at minimum: id, clinicId, patientId (if present), submissionStatus, personalInfo (fullName, country, roomNumber, whatsappNumber, medicalConditions, symptoms), demographic (age, unitOfMeasure, gestationalAge, gender), timestamps (submission/recorded/followUp where present), detailedInfo (date, time, context where present), initialScore, summary (score + status), feedbackCode (if present), notes (if present), additionalInfo (if present).",
-        "For older submissions that may have missing structured personalInfo fields, the UI still shows the best-available patient details by falling back to extracting values from detailedInfo.context, without breaking the page.",
-        "All user-facing labels in the expanded Patient Details view are in English."
+        "Patient form submits successfully without error messages",
+        "Form data is properly saved to backend",
+        "User is redirected to success page after successful submission",
+        "Error handling provides specific feedback if submission fails"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/patientSubmissionDetails.ts",
-          "operation": "create",
-          "description": "Add display-focused helpers to derive a complete, best-available Patient Details view-model from a PatientSubmission: prefer structured fields (personalInfo/demographic/timestamps/etc.) and safely fall back to parsing detailedInfo.context only for missing values; include defensive parsing/formatting (bigint to string, optional timestamps) to prevent runtime errors."
-        },
-        {
-          "path": "frontend/src/components/team/PatientDetailsCard.tsx",
-          "operation": "create",
-          "description": "Create a composed PatientDetailsCard component to render the full PatientSubmission details using readable structured layouts (e.g., definition lists/sections) and English labels; consume the view-model from frontend/src/utils/patientSubmissionDetails.ts. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/TeamManagementPage.tsx",
+          "path": "frontend/src/pages/PatientFormPage.tsx",
           "operation": "modify",
-          "description": "Replace/extend the current inline Patient Details UI to use PatientDetailsCard and show all required fields (id/clinicId/patientId/submissionStatus/personalInfo/demographic/timestamps/detailedInfo/initialScore/summary/feedbackCode/notes/additionalInfo); keep existing WhatsApp button behavior and ensure fallback parsing is only used when structured fields are missing."
+          "description": "Add detailed error logging in the form submission handler to capture the exact error from the submitPatientForm mutation. Log the complete error object, error message, and submission data structure to console. Wrap the submission in try-catch to capture any synchronous errors. Add specific error state to display the actual error message to users instead of generic 'Failed to submit form' message. Ensure the PatientSubmission object matches the backend interface exactly, particularly the structured personalInfo fields (fullName, country, roomNumber, whatsappNumber, medicalConditions, symptoms)."
+        },
+        {
+          "path": "frontend/src/hooks/useSubmissions.ts",
+          "operation": "modify",
+          "description": "Enhance the submitPatientForm mutation to include detailed error logging. Add onError callback to log the full error object, error message, and any validation details from the backend. Ensure the mutation properly propagates errors to the calling component. Add console.error statements to capture network errors, backend validation issues, or data format problems. Verify that the mutation correctly handles the PatientSubmission type matching the backend interface."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Render responsesSectionA and responsesSectionB in Patient Details with readable per-response fields and clear empty states.",
+      "summary": "Add proper error logging and validation feedback to identify the root cause of submission failures",
       "acceptanceCriteria": [
-        "Patient Details includes visible sections for Section A responses and Section B responses.",
-        "Each displayed response includes: scoreType (or a clear placeholder like \"N/A\"), answer.text, answer.score, and feedbackText (if present).",
-        "If a section has zero responses, the UI shows a clear English empty state for that section (e.g., \"No responses recorded\")."
+        "Console logs show detailed error information when submission fails",
+        "User receives specific error messages indicating what went wrong",
+        "Form validation errors are displayed inline on relevant fields"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/team/QuestionnaireResponsesSection.tsx",
-          "operation": "create",
-          "description": "Create a QuestionnaireResponsesSection component that renders a section title (Section A / Section B) and a readable list/table/definition-list of QuestionResponse items showing scoreType (or \"N/A\"), answer.text, answer.score, and feedbackText when present; include an English empty state when no responses exist. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/pages/PatientFormPage.tsx",
+          "operation": "modify",
+          "description": "Add client-side validation for all required fields (fullName, country, roomNumber, whatsappNumber, medicalConditions, symptoms) before submission. Display inline validation errors next to each field when validation fails. Add field-level error state management. Log validation failures to console with details about which fields failed and why. Ensure validation messages are specific and actionable (e.g., 'Full name is required', 'WhatsApp number must be valid')."
         },
         {
-          "path": "frontend/src/components/team/PatientDetailsCard.tsx",
+          "path": "frontend/src/hooks/useSubmissions.ts",
           "operation": "modify",
-          "description": "Integrate QuestionnaireResponsesSection into the expanded Patient Details rendering to display responsesSectionA and responsesSectionB under clearly labeled subsections with the required fields and empty states. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/TeamManagementPage.tsx",
-          "operation": "modify",
-          "description": "Wire the updated PatientDetailsCard (now including questionnaire responses sections) into the /team page so that selecting a submission reliably shows both Section A and Section B responses (or English empty states) in Patient Details."
+          "description": "Add comprehensive error handling in the submitPatientForm mutation. Log network errors with request/response details. Log backend validation errors with field-specific information if available. Log data format errors showing the expected vs actual data structure. Add error categorization (network, validation, format) to help identify the root cause. Ensure errors are properly typed and include stack traces where applicable."
         }
       ]
     }

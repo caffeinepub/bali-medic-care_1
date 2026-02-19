@@ -1,12 +1,12 @@
 {
   "frontend/src/App.tsx": "Main application component with TanStack Router setup, defining all routes (patient form, dashboard, team management, success screens) and wrapping with ThemeProvider and Toaster.",
   "frontend/src/components/layout/AppShell.tsx": "Root layout component that wraps all pages with header, main content area, and footer.",
-  "frontend/src/components/layout/AppHeader.tsx": "Application header with logo, navigation toggle between patient/medical team views, and login button that is hidden on patient pages when not authenticated.",
-  "frontend/src/components/layout/AppFooter.tsx": "Footer component with copyright notice and Caffeine.ai attribution with UTM tracking.",
+  "frontend/src/components/layout/AppHeader.tsx": "Application header with updated logo (bali-medic-care-logo-v2.dim_512x512.png), navigation toggle between patient/medical team views, and login button that is hidden on patient pages when not authenticated.",
+  "frontend/src/components/layout/AppFooter.tsx": "Footer component with social media links (Website, Instagram, Facebook, WhatsApp) displayed first, followed by the fixed copyright line \"© 2026 Bali Medic Care\" at the bottom.",
   "frontend/src/components/auth/LoginButton.tsx": "Internet Identity login/logout button with loading states, error handling, and medical-team-specific labeling on patient pages.",
   "frontend/src/components/auth/ProtectedRoute.tsx": "Route guard component that requires authentication for medical team routes and shows medical-team-specific access denied screen for unauthenticated users.",
   "frontend/src/components/auth/ProfileSetupDialog.tsx": "Modal dialog that prompts first-time users to enter their name after logging in.",
-  "frontend/src/pages/PatientFormPage.tsx": "Patient registration form that submits structured personalInfo fields (fullName, country, roomNumber, whatsappNumber, symptoms, medicalConditions) to the backend, with actor readiness checks and enhanced error logging.",
+  "frontend/src/pages/PatientFormPage.tsx": "Patient registration form with comprehensive client-side validation, inline error messages for each field, detailed error logging with categorization (network, authorization, backend errors), and specific user-facing error messages based on error type.",
   "frontend/src/pages/SubmissionSuccessPage.tsx": "Success confirmation screen shown after patient form submission with option to submit another response.",
   "frontend/src/pages/DashboardPage.tsx": "Authenticated dashboard displaying all patient submissions with runtime regression checks for id=0 submissions and enhanced navigation logging.",
   "frontend/src/pages/TeamManagementPage.tsx": "Medical team examination page that now uses PatientDetailsCard to display complete patient submission details including all structured fields and questionnaire responses, maintaining existing medical examination form and WhatsApp integration.",
@@ -17,7 +17,7 @@
   "frontend/src/components/dashboard/SubmissionsTable.tsx": "Dashboard list component that displays patient submissions preferring structured personalInfo fields (fullName, roomNumber) with fallback to context parsing for backward compatibility.",
   "frontend/src/components/dashboard/ExportButton.tsx": "CSV export component that prefers structured personalInfo fields (fullName, country, roomNumber, whatsappNumber, symptoms) with fallback to context parsing for older submissions.",
   "frontend/src/hooks/useQueries.ts": "Minimal query hook file as all queries are organized in feature-specific hooks.",
-  "frontend/src/hooks/useSubmissions.ts": "React Query hooks for patient submissions with proper actor initialization guards, using updatePatientSubmission backend method for updates instead of creating new records.",
+  "frontend/src/hooks/useSubmissions.ts": "React Query hooks for patient submissions with extensive error logging including backend call tracing, error categorization, full error object serialization, and detailed actor state tracking to diagnose submission failures.",
   "frontend/src/hooks/useUserProfile.ts": "React Query hooks for fetching and saving user profiles with proper loading state handling to prevent modal flashing.",
   "frontend/src/hooks/useClinicTeam.ts": "React Query hooks for fetching and updating clinic team members.",
   "frontend/src/index.css": "Global styles with Google Forms-inspired OKLCH color system, custom animations, and typography settings.",
@@ -25,5 +25,5 @@
   "frontend/src/utils/whatsapp.ts": "WhatsApp integration utilities that extract patient info from structured personalInfo fields with fallback to context parsing, building message templates and wa.me URLs.",
   "frontend/src/utils/patientSubmissionDetails.ts": "Utility functions to create a complete view-model for displaying PatientSubmission details, preferring structured fields with safe fallback to context parsing, including bigint-to-string conversion and timestamp formatting.",
   "frontend/src/components/team/QuestionnaireResponsesSection.tsx": "Component that renders questionnaire responses (Section A or B) with scoreType, answer text/score, and feedbackText, showing an English empty state when no responses exist.",
-  "frontend/src/components/team/PatientDetailsCard.tsx": "Comprehensive patient details card component that displays all PatientSubmission fields including personal info, demographics, timestamps, scores, notes, and questionnaire responses using structured layouts with English labels."
+  "frontend/src/components/team/PatientDetailsCard.tsx": "Comprehensive patient details card component that displays PatientSubmission fields including personal info, demographics, timestamps, and detailed information using structured layouts with English labels, with all score sections, additional information, and questionnaire responses removed."
 }

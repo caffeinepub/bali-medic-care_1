@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import type { PatientSubmission } from '@/backend';
 import { getPatientDetailsViewModel } from '@/utils/patientSubmissionDetails';
-import QuestionnaireResponsesSection from './QuestionnaireResponsesSection';
 
 interface PatientDetailsCardProps {
   submission: PatientSubmission;
@@ -158,81 +157,6 @@ export default function PatientDetailsCard({ submission, onWhatsAppClick }: Pati
               <p className="text-sm text-foreground break-words">{details.detailedInfo.context}</p>
             </div>
           </div>
-        </div>
-
-        <Separator />
-
-        {/* Scores */}
-        <div>
-          <h4 className="font-semibold text-sm text-foreground mb-2">Scores</h4>
-          <div className="space-y-3">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Initial Score</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/30 rounded p-2">
-                  <p className="text-xs text-muted-foreground">Obstructive</p>
-                  <p className="text-sm font-medium text-foreground">{details.initialScore.obstructive}</p>
-                </div>
-                <div className="bg-muted/30 rounded p-2">
-                  <p className="text-xs text-muted-foreground">Central</p>
-                  <p className="text-sm font-medium text-foreground">{details.initialScore.central}</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Summary Score</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/30 rounded p-2">
-                  <p className="text-xs text-muted-foreground">Obstructive</p>
-                  <p className="text-sm font-medium text-foreground">{details.summary.score.obstructive}</p>
-                </div>
-                <div className="bg-muted/30 rounded p-2">
-                  <p className="text-xs text-muted-foreground">Central</p>
-                  <p className="text-sm font-medium text-foreground">{details.summary.score.central}</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Summary Status</p>
-              <p className="text-sm font-medium text-foreground">{details.summary.status}</p>
-            </div>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Additional Fields */}
-        <div>
-          <h4 className="font-semibold text-sm text-foreground mb-2">Additional Information</h4>
-          <div className="space-y-2">
-            <div>
-              <p className="text-xs text-muted-foreground">Feedback Code</p>
-              <p className="text-sm font-medium text-foreground">{details.feedbackCode}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Notes</p>
-              <p className="text-sm text-foreground">{details.notes}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Additional Info</p>
-              <p className="text-sm text-foreground">{details.additionalInfo}</p>
-            </div>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Questionnaire Responses */}
-        <div className="space-y-4">
-          <h4 className="font-semibold text-sm text-foreground">Questionnaire Responses</h4>
-          <QuestionnaireResponsesSection
-            title="Section A Responses"
-            responses={details.responsesSectionA}
-          />
-          <QuestionnaireResponsesSection
-            title="Section B Responses"
-            responses={details.responsesSectionB}
-          />
         </div>
       </div>
     </div>
